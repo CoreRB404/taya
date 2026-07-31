@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="240" viewBox="0 0 1000 240" role="img" aria-labelledby="title desc">
+  <title id="title">TAYA logo</title>
+  <desc id="desc">TAYA Detainee Rights and Overstay Alert System</desc>
+  <defs>
+    <linearGradient id="taya-gradient" x1="20" y1="20" x2="200" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5B6EE8"/>
+      <stop offset="1" stop-color="#3B4CC4"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#3B4CC4" flood-opacity=".24"/>
+    </filter>
+  </defs>
+
+  <rect x="20" y="20" width="200" height="200" rx="48" fill="url(#taya-gradient)" filter="url(#soft-shadow)"/>
+  <g transform="translate(48 48) scale(6)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 3h5v5"/>
+    <path d="M8 3H3v5"/>
+    <path d="M12 3v4"/>
+    <path d="M12 21v-8"/>
+    <path d="M5 8l7-1 7 1"/>
+    <path d="M5 8l-2 6a3 3 0 0 0 6 0Z"/>
+    <path d="M19 8l2 6a3 3 0 0 1-6 0Z"/>
+  </g>
+
+  <text x="270" y="128" fill="#10172A" font-family="Inter, Arial, Helvetica, sans-serif" font-size="112" font-weight="800" letter-spacing="2">TAYA</text>
+  <text x="276" y="176" fill="#64748B" font-family="Inter, Arial, Helvetica, sans-serif" font-size="27" font-weight="500" letter-spacing=".4">Detainee Rights &amp; Overstay Alert System</text>
+</svg>

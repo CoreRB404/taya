@@ -1,0 +1,37 @@
+flowchart TD
+    A[User Logs In] --> B{Valid Credentials?}
+    B -- No --> C[Show Error / Retry Login]
+    B -- Yes --> D[Route to Dashboard by Role]
+
+    D --> E[Admin Dashboard]
+    D --> F[BJMP Staff Dashboard]
+    D --> G[Lawyer Dashboard]
+    D --> H[Policy Advocate Dashboard]
+
+    E --> E1[Manage Users]
+    E --> E2[Manage Facilities]
+    E --> E3[Manage Penalty References]
+    E --> E4[Review Audit Logs]
+    E --> E5[Monitor Overcrowding & Bail Metrics]
+
+    F --> F1[Track Detainee Cases at Assigned Facility]
+    F --> F2[Update Detainee Case Phases]
+    F --> F3[Review Active Alerts]
+    F --> F4[Resolve / Close Cases]
+
+    G --> G1[Review Alert Queue]
+    G --> G2[Prioritize Critical Cases]
+    G --> G3[File Legal Action]
+    G --> G4[Monitor Case Resolution]
+
+    H --> H1[View System Analytics]
+    H --> H2[Export Policy Reports]
+    H --> H3[Track Bail Affordability]
+    H --> H4[Track Facility Overcrowding]
+
+    F4 --> I{Case Resolved?}
+    G4 --> I
+    E4 --> I
+    H4 --> I
+    I -- Yes --> J[Case Closed]
+    I -- No --> K[Continue Monitoring]
