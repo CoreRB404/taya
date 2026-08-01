@@ -13,7 +13,7 @@ RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist
 COPY . .
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative --no-interaction
 
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libcurl4-openssl-dev libfreetype6-dev libjpeg62-turbo-dev libonig-dev libpng-dev libpq-dev libxml2-dev libzip-dev unzip \

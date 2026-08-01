@@ -16,7 +16,7 @@ Public registration is disabled by default. Production MFA is mandatory and send
 
 ## Local setup with PostgreSQL
 
-Requirements: PHP 8.3+, Composer, Node.js 22+, npm, and PostgreSQL client support (`pdo_pgsql`).
+Requirements: PHP 8.4.1+, Composer, Node.js 22+, npm, and PostgreSQL client support (`pdo_pgsql`).
 
 ```bash
 composer install
