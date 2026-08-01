@@ -35,8 +35,6 @@ class UserSeeder extends Seeder
                 'password' => Hash::make($password),
                 'role' => 'admin',
                 'facility_id' => null,
-                'is_active' => true,
-                'mfa_enabled' => true,
                 'email_verified_at' => now(),
             ]
         );
