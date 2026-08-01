@@ -47,6 +47,20 @@ return [
             'report' => false,
         ],
 
+        'supabase' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_STORAGE_ACCESS_KEY_ID'),
+            'secret' => env('SUPABASE_STORAGE_SECRET_ACCESS_KEY'),
+            'region' => env('SUPABASE_STORAGE_REGION'),
+            'bucket' => env('SUPABASE_STORAGE_BUCKET', 'taya-documents'),
+            'endpoint' => env('SUPABASE_STORAGE_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            // Never create a document database row after a silent remote
+            // storage failure.
+            'throw' => true,
+            'report' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

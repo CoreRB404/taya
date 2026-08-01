@@ -37,6 +37,18 @@ services:
         value: "true"
       - key: CACHE_STORE
         value: database
+      - key: DOCUMENTS_DISK
+        value: supabase
+      - key: SUPABASE_STORAGE_ENDPOINT
+        sync: false
+      - key: SUPABASE_STORAGE_REGION
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: taya-documents
+      - key: SUPABASE_STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: SUPABASE_STORAGE_SECRET_ACCESS_KEY
+        sync: false
       - key: QUEUE_CONNECTION
         value: sync
       - key: REGISTRATION_ENABLED

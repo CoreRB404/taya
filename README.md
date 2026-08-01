@@ -42,6 +42,15 @@ Create a Supabase project and copy its PostgreSQL direct or session-pooler conne
 
 Supabase database passwords must be URL-encoded inside `DB_URL`. Never commit `.env`, dashboard service keys, database dumps, or connection strings. Rotate any credential that was previously committed.
 
+### Private document storage
+
+1. In Supabase, open **Storage**, create a bucket named `taya-documents`, and keep **Public bucket disabled**.
+2. Open **Storage > S3 Configuration**, enable the S3 protocol, and generate a server-side access-key pair.
+3. Copy the endpoint, region, access-key ID, and secret into the matching `SUPABASE_STORAGE_*` Render secrets. Never put these credentials in frontend/Vite variables.
+4. Keep `DOCUMENTS_DISK=supabase` in production. Authorized downloads are streamed through Laravel; the private bucket is never exposed directly to the browser.
+
+If this installation already has local documents, configure the Supabase variables locally and run `php artisan documents:migrate-to-supabase`. Verify the remote files first, then optionally rerun with `--delete-local`. The command changes a database record to the Supabase disk only after verifying its remote object.
+
 ## Render deployment
 
 This repository includes [render.yaml](render.yaml) and a multi-stage [Dockerfile](Dockerfile). The current Blade architecture deploys as one Render web service: Vite compiles the frontend into the image and Laravel serves both the UI and backend. A separate static frontend service would require converting the UI into an independent SPA/API client.
@@ -50,11 +59,12 @@ This repository includes [render.yaml](render.yaml) and a multi-stage [Dockerfil
 2. Set `APP_URL` to the final HTTPS Render URL.
 3. Generate `APP_KEY` locally with `php artisan key:generate --show` and store it as a Render secret.
 4. Store the Supabase connection string in the Render `DB_URL` secret.
-5. Configure all SMTP variables; mandatory production MFA and password reset depend on working email. Render Free blocks outbound SMTP ports 25, 465, and 587, so select a provider endpoint on an allowed port such as 2525.
-6. Set one-time bootstrap secrets `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`. After the first successful deploy, remove `ADMIN_PASSWORD`; the seeder will never change the existing account.
-7. Deploy. The container caches Laravel configuration/views/routes, runs migrations, and idempotently creates the first admin.
+5. Create the private Supabase Storage bucket and configure all `SUPABASE_STORAGE_*` secrets described above.
+6. Configure all SMTP variables; mandatory production MFA and password reset depend on working email. Render Free blocks outbound SMTP ports 25, 465, and 587, so select a provider endpoint on an allowed port such as 2525.
+7. Set one-time bootstrap secrets `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`. After the first successful deploy, remove `ADMIN_PASSWORD`; the seeder will never change the existing account.
+8. Deploy. The container caches Laravel configuration/views/routes, runs migrations, and idempotently creates the first admin.
 
-Render Free sleeps after inactivity, has an ephemeral filesystem, and is explicitly intended for previews/hobby workloads rather than sensitive production systems. Private document uploads need durable object storage before real use (for example an S3-compatible disk); otherwise uploads can disappear after a restart or redeploy. Scheduled checks also run only while the web instance is awake.
+Render Free sleeps after inactivity and is explicitly intended for previews/hobby workloads rather than sensitive production systems. Uploaded documents now use durable private Supabase Storage, but scheduled checks still run only while the web instance is awake.
 
 ## Verification
 
