@@ -99,7 +99,7 @@ return [
             'sslmode' => env('DB_SSLMODE', 'require'),
             'sslrootcert' => env('DB_SSLROOTCERT'),
             'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                \PDO::ATTR_EMULATE_PREPARES => env('DB_EMULATE_PREPARES', true),
+                \PDO::ATTR_EMULATE_PREPARES => env('DB_EMULATE_PREPARES', false),
             ], fn ($value) => $value !== null) : [],
         ],
 

@@ -38,7 +38,7 @@ The seeder is idempotent and never resets an existing admin password. Do not run
 
 ## Supabase
 
-Create a Supabase project and copy its PostgreSQL direct or session-pooler connection string into `DB_URL`. For an IPv4 Render service, Supabase's session-mode pooler on port 5432 is the safest default. Keep `DB_CONNECTION=pgsql` and at least `DB_SSLMODE=require`; for full certificate identity verification, mount Supabase's CA certificate, set `DB_SSLROOTCERT`, and use `DB_SSLMODE=verify-full`. The included migrations are portable across PostgreSQL and the SQLite test database.
+Create a Supabase project and copy its PostgreSQL direct or session-pooler connection string into `DB_URL`. For an IPv4 Render service, Supabase's session-mode pooler on port 5432 is the safest default. Keep `DB_CONNECTION=pgsql`, `DB_EMULATE_PREPARES=false`, and at least `DB_SSLMODE=require`; for full certificate identity verification, mount Supabase's CA certificate, set `DB_SSLROOTCERT`, and use `DB_SSLMODE=verify-full`. The included migrations are portable across PostgreSQL and the SQLite test database.
 
 Supabase database passwords must be URL-encoded inside `DB_URL`. Never commit `.env`, dashboard service keys, database dumps, or connection strings. Rotate any credential that was previously committed.
 
