@@ -113,24 +113,61 @@ class AdminController extends Controller
     public function usersResetPassword(User $user)
     {
         $this->authorize('manage-users');
-        Password::sendResetLink(['email' => $user->email]);
+
+        try {
+            $status = Password::sendResetLink(['email' => $user->email]);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()->back()->with('error', 'The reset link could not be sent. Check the mail configuration and try again.');
+        }
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return redirect()->back()->with('error', 'The reset link could not be sent. Please try again.');
+        }
+
         AuditService::log('user_password_reset_requested', "Password reset link requested for user #{$user->id}");
+
         return redirect()->back()->with('success', 'If mail delivery is configured, a password reset link has been sent.');
     }
 
     public function usersChangePassword(Request $request, User $user)
     {
         $this->authorize('manage-users');
-        abort_if($user->id === $request->user()->id, 422, 'Change your own password from the profile page.');
-        $validated = $request->validate([
+        $validated = $request->validateWithBag('changePassword', [
             'current_password' => ['required', 'current_password'],
-            'new_password' => ['required', 'confirmed', PasswordRule::defaults()],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+            'change_password_user_id' => ['required', 'integer', Rule::in([$user->id])],
+            'change_password_user_name' => ['required', 'string', 'max:255'],
         ]);
 
-        $user->update(['password' => $validated['new_password'], 'remember_token' => null]);
-        DB::table('sessions')->where('user_id', $user->id)->delete();
-        AuditService::log('user_password_changed', "Password changed manually for user #{$user->id}");
-        
+        $isOwnPassword = $user->is($request->user());
+        $currentSessionId = $request->session()->getId();
+
+        $user->forceFill([
+            'password' => $validated['password'],
+            'remember_token' => null,
+            'mfa_code_hash' => null,
+            'mfa_expires_at' => null,
+        ])->save();
+
+        $sessions = DB::table('sessions')->where('user_id', $user->id);
+        if ($isOwnPassword) {
+            $sessions->where('id', '!=', $currentSessionId);
+        }
+        $sessions->delete();
+
+        if ($isOwnPassword) {
+            $request->session()->regenerate();
+        }
+
+        AuditService::log(
+            $isOwnPassword ? 'admin_own_password_changed' : 'user_password_changed',
+            $isOwnPassword
+                ? 'Administrator changed their own password from user management.'
+                : "Administrator changed the password for user #{$user->id}."
+        );
+
         return redirect()->back()->with('success', "Password updated successfully for {$user->name}.");
     }
 
@@ -142,21 +179,46 @@ class AdminController extends Controller
             'user_ids.*' => 'integer|distinct|exists:users,id'
         ]);
 
-        $count = 0;
+        $sentCount = 0;
+        $failedCount = 0;
+
         foreach ($validated['user_ids'] as $id) {
             $user = User::find($id);
-            if ($user && $user->id !== auth()->id()) { // Don't allow bulk reset on self accidentally
-                Password::sendResetLink(['email' => $user->email]);
-                $count++;
+
+            if (! $user || $user->id === auth()->id()) {
+                continue;
+            }
+
+            try {
+                $status = Password::sendResetLink(['email' => $user->email]);
+                if ($status === Password::RESET_LINK_SENT) {
+                    $sentCount++;
+                } else {
+                    $failedCount++;
+                }
+            } catch (\Throwable $exception) {
+                report($exception);
+                $failedCount++;
             }
         }
 
-        if ($count > 0) {
-            AuditService::log('bulk_password_reset_requested', "Bulk password reset links requested for {$count} users");
-            return redirect()->back()->with('success', "Password reset links requested for {$count} users.");
+        if ($sentCount > 0) {
+            AuditService::log('bulk_password_reset_requested', "Bulk password reset links requested for {$sentCount} users");
+
+            $message = "Password reset links sent to {$sentCount} users.";
+            if ($failedCount > 0) {
+                $message .= " {$failedCount} could not be sent.";
+            }
+
+            return redirect()->back()->with('success', $message);
         }
-        
-        return redirect()->back()->with('error', 'No valid users selected for password reset.');
+
+        return redirect()->back()->with(
+            'error',
+            $failedCount > 0
+                ? 'No reset links could be sent. Check the mail configuration and try again.'
+                : 'No valid users selected for password reset.'
+        );
     }
 
     // ── Facility Management ──────────────────────────

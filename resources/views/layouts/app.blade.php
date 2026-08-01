@@ -113,6 +113,15 @@
                         <p class="text-xs text-white/60 truncate capitalize">{{ str_replace('_', ' ', auth()->user()->role) }}</p>
                     </div>
                 </div>
+                <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                    @csrf
+                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:border-red-300/40 hover:bg-red-500/15 hover:text-white">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
             </div>
         </aside>
 
