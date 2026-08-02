@@ -13,19 +13,11 @@ class AdminUserManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config(['security.mfa.required' => false]);
-    }
-
     public function test_admin_user_creation_form_includes_password_fields(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
 
         $response = $this->actingAs($admin)->get(route('admin.users.index'));
@@ -47,13 +39,8 @@ class AdminUserManagementTest extends TestCase
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
-        $user = User::factory()->create([
-            'is_active' => true,
-            'mfa_code_hash' => Hash::make('123456'),
-            'mfa_expires_at' => now()->addMinutes(10),
-        ]);
+        $user = User::factory()->create(['is_active' => true]);
 
         $response = $this->actingAs($admin)->post(route('admin.users.change-password', $user), [
             'current_password' => 'password',
@@ -66,8 +53,6 @@ class AdminUserManagementTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertTrue(Hash::check('Secure-New-Password!42', $user->refresh()->password));
-        $this->assertNull($user->mfa_code_hash);
-        $this->assertNull($user->mfa_expires_at);
     }
 
     public function test_admin_can_change_their_own_password_from_user_management(): void
@@ -75,7 +60,6 @@ class AdminUserManagementTest extends TestCase
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
 
         $response = $this->actingAs($admin)->post(route('admin.users.change-password', $admin), [
@@ -97,7 +81,6 @@ class AdminUserManagementTest extends TestCase
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
         $user = User::factory()->create(['is_active' => true]);
         $originalPassword = $user->password;
@@ -125,7 +108,6 @@ class AdminUserManagementTest extends TestCase
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
         $users = User::factory()->count(2)->create(['is_active' => true]);
 

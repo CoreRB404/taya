@@ -22,13 +22,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'facility_id',
-        'mfa_enabled',
         'is_active',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        // Keep legacy MFA data private until the deployed database columns are
+        // removed in a separately reviewed schema cleanup.
         'mfa_code_hash',
     ];
 
@@ -37,10 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'mfa_enabled' => 'boolean',
             'is_active' => 'boolean',
-            'mfa_expires_at' => 'datetime',
-            'mfa_last_sent_at' => 'datetime',
         ];
     }
 
@@ -114,8 +112,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return true;
     }
 
-    public function requiresMfa(): bool
-    {
-        return (bool) config('security.mfa.required') || $this->mfa_enabled;
-    }
 }

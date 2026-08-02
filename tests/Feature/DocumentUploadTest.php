@@ -21,7 +21,6 @@ class DocumentUploadTest extends TestCase
         parent::setUp();
 
         config([
-            'security.mfa.required' => false,
             'security.documents.disk' => 'supabase',
         ]);
         Storage::fake('supabase');
@@ -140,7 +139,6 @@ class DocumentUploadTest extends TestCase
         $admin = User::factory()->create([
             'role' => 'admin',
             'is_active' => true,
-            'mfa_enabled' => false,
         ]);
 
         $facility = Facility::create([

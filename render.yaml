@@ -53,8 +53,6 @@ services:
         value: sync
       - key: REGISTRATION_ENABLED
         value: "false"
-      - key: MFA_REQUIRED
-        value: "true"
       - key: ADMIN_NAME
         value: System Admin
       - key: ADMIN_EMAIL

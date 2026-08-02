@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -29,24 +28,6 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-
-        if ($request->user()->requiresMfa()) {
-            try {
-                MfaChallengeController::sendCode($request->user());
-            } catch (\Throwable $exception) {
-                report($exception);
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-
-                throw ValidationException::withMessages([
-                    'email' => 'We could not send your verification code. Please contact an administrator.',
-                ]);
-            }
-            AuditService::log('login_password_verified', 'Password accepted; MFA challenge issued.');
-
-            return redirect()->route('mfa.challenge');
-        }
 
         AuditService::log('login_success', 'User signed in.');
 

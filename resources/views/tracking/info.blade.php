@@ -209,7 +209,7 @@
     <a class="navlink" href="#how">How It Works</a>
     <div class="header-actions">
       <a class="btn-primary" href="{{ route('tracking.lookup') }}">Track a Detainee</a>
-      <a class="btn-ghost" href="#">Staff Login →</a>
+      <a class="btn-ghost" href="{{ route('login') }}">Staff Login →</a>
     </div>
   </nav>
 </header>
@@ -355,7 +355,7 @@
     <a href="#">Privacy Policy</a>
     <a href="#">Data Privacy Act Notice</a>
     <a href="#">Contact BJMP</a>
-    <a class="btn-ghost" href="#">Staff Login →</a>
+    <a class="btn-ghost" href="{{ route('login') }}">Staff Login →</a>
   </div>
 </footer>
 

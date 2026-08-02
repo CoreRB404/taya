@@ -37,7 +37,6 @@ class AdminController extends Controller
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
             'role' => ['required', Rule::in(UserRole::assignableValues())],
             'facility_id' => ['nullable', 'integer', 'exists:facilities,id', Rule::requiredIf($request->input('role') === UserRole::STAFF->value)],
-            'mfa_enabled' => ['nullable', 'boolean'],
         ]);
 
         $user = User::create([
@@ -46,7 +45,6 @@ class AdminController extends Controller
             'password' => $validated['password'],
             'role' => $validated['role'],
             'facility_id' => $validated['facility_id'] ?? null,
-            'mfa_enabled' => $validated['mfa_enabled'] ?? true,
             'is_active' => true,
         ]);
 
@@ -64,7 +62,6 @@ class AdminController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email:rfc', 'max:255', Rule::unique('users', 'email')->ignore($user)],
             'role' => ['required', Rule::in(UserRole::assignableValues())],
             'facility_id' => ['nullable', 'integer', 'exists:facilities,id', Rule::requiredIf($request->input('role') === UserRole::STAFF->value)],
-            'mfa_enabled' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 
@@ -147,8 +144,6 @@ class AdminController extends Controller
         $user->forceFill([
             'password' => $validated['password'],
             'remember_token' => null,
-            'mfa_code_hash' => null,
-            'mfa_expires_at' => null,
         ])->save();
 
         $sessions = DB::table('sessions')->where('user_id', $user->id);

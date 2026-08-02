@@ -41,7 +41,6 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'staff',
-            'mfa_enabled' => true,
         ]);
 
         event(new Registered($user));

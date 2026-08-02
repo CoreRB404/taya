@@ -7,7 +7,7 @@ Route::get('/', [\App\Http\Controllers\TrackingController::class, 'landing'])->n
 Route::get('/track', [\App\Http\Controllers\TrackingController::class, 'lookup'])->middleware('throttle:30,1')->name('tracking.lookup');
 Route::get('/track/{code}', [\App\Http\Controllers\TrackingController::class, 'show'])->where('code', 'TAYA-[A-Z0-9]{6,12}')->middleware('throttle:30,1')->name('tracking.show');
 
-Route::middleware(['auth', 'active', 'verified', 'mfa'])->group(function () {
+Route::middleware(['auth', 'active', 'verified'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::middleware('role:admin,staff,lawyer,auditor,authorized_user')->group(function () {

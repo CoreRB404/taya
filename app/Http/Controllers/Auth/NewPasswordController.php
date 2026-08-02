@@ -47,8 +47,6 @@ class NewPasswordController extends Controller
                 $user->forceFill([
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
-                    'mfa_code_hash' => null,
-                    'mfa_expires_at' => null,
                 ])->save();
 
                 DB::table('sessions')->where('user_id', $user->id)->delete();

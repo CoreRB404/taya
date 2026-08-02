@@ -1,6 +1,6 @@
 # TAYA
 
-TAYA is a Laravel 13 detainee rights and overstay alert application. It uses PostgreSQL, server-rendered Blade/Vite assets, admin-provisioned accounts, role-based access control, email MFA, password reset, encrypted sessions, private document downloads, audit logs, validation, throttling, and production security headers.
+TAYA is a Laravel 13 detainee rights and overstay alert application. It uses PostgreSQL, server-rendered Blade/Vite assets, admin-provisioned accounts, role-based access control, password reset, encrypted sessions, private document downloads, audit logs, validation, throttling, and production security headers.
 
 See [SECURITY.md](SECURITY.md) for the operational checklist and remaining infrastructure requirements.
 
@@ -12,7 +12,7 @@ See [SECURITY.md](SECURITY.md) for the operational checklist and remaining infra
 - `auditor`: read-only case/report access plus audit logs.
 - `authorized_user`: backward-compatible legacy access; migrate these accounts to a specific role.
 
-Public registration is disabled by default. Production MFA is mandatory and sends a six-digit one-time code by email after password authentication.
+Public registration is disabled by default. Staff sign in directly with their provisioned email address and password.
 
 ## Local setup with PostgreSQL
 
@@ -60,7 +60,7 @@ This repository includes [render.yaml](render.yaml) and a multi-stage [Dockerfil
 3. Generate `APP_KEY` locally with `php artisan key:generate --show` and store it as a Render secret.
 4. Store the Supabase connection string in the Render `DB_URL` secret.
 5. Create the private Supabase Storage bucket and configure all `SUPABASE_STORAGE_*` secrets described above.
-6. Configure all SMTP variables; mandatory production MFA and password reset depend on working email. Render Free blocks outbound SMTP ports 25, 465, and 587, so select a provider endpoint on an allowed port such as 2525.
+6. Configure all SMTP variables; password reset depends on working email. Render Free blocks outbound SMTP ports 25, 465, and 587, so select a provider endpoint on an allowed port such as 2525.
 7. Set one-time bootstrap secrets `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`. After the first successful deploy, remove `ADMIN_PASSWORD`; the seeder will never change the existing account.
 8. Deploy. The container caches Laravel configuration/views/routes, runs migrations, and idempotently creates the first admin.
 
@@ -74,4 +74,4 @@ npm run build
 php artisan route:list
 ```
 
-Production settings should keep `APP_DEBUG=false`, `REGISTRATION_ENABLED=false`, `MFA_REQUIRED=true`, encrypted secure cookies, HTTPS, and a real SMTP provider.
+Production settings should keep `APP_DEBUG=false`, `REGISTRATION_ENABLED=false`, encrypted secure cookies, HTTPS, and a real SMTP provider.

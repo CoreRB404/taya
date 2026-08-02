@@ -4,7 +4,6 @@
 
 - Admin-provisioned accounts; public registration disabled in production.
 - Strong password policy, non-enumerating reset requests, short-lived reset tokens, login throttling, session rotation, and session revocation on password/account changes.
-- Mandatory production email MFA with hashed, expiring, single-use codes and attempt/resend throttles.
 - Roles for admin, facility-scoped staff, lawyer, and read-only auditor; model policies enforce record access independently of navigation visibility.
 - Strict validation and allowlists on writes, filters, uploads, role assignment, related record IDs, and report exports.
 - CSRF protection, encrypted secure/HTTP-only/SameSite cookies, HTTPS enforcement, production error suppression, sensitive-input flash suppression, and security response headers.
@@ -16,7 +15,7 @@
 
 1. Use a paid production-grade runtime or formally accept Render Free's sleep, restart, SMTP-port, and ephemeral-filesystem limitations.
 2. Create the private `taya-documents` Supabase Storage bucket, configure its server-only S3 credentials in Render, and migrate any legacy local documents before deployment.
-3. Configure SMTP on an allowed outbound port (for example 2525), test MFA/password reset, and keep email content free of case details.
+3. Configure SMTP on an allowed outbound port (for example 2525), test password reset, and keep email content free of case details.
 4. Prefer PostgreSQL `verify-full` with the Supabase CA certificate, restrict database credentials to Render secrets, rotate credentials periodically, and enable appropriate Supabase backups.
 5. Remove the bootstrap `ADMIN_PASSWORD` secret after the first deploy; create subsequent users through the admin UI.
 6. Run `composer test`, `composer audit`, `npm audit`, and a migration rehearsal against a staging Supabase project before production deployment.

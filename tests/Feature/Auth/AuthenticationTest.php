@@ -30,6 +30,25 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
+    public function test_legacy_mfa_fields_do_not_interrupt_login(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill([
+            'mfa_enabled' => true,
+            'mfa_code_hash' => 'legacy-value',
+            'mfa_expires_at' => now()->addMinutes(10),
+        ])->save();
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->get('/mfa-challenge')->assertNotFound();
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();

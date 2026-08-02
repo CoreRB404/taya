@@ -29,6 +29,6 @@ class AlertNotification extends Notification implements ShouldQueue
             ->line("Alert #{$this->alert->id} requires review in TAYA.")
             ->line('Sensitive case details are intentionally omitted from email.')
             ->action('View alert details', url("/alerts/{$this->alert->id}"))
-            ->line('Sign in with MFA to review and take action.');
+            ->line('Sign in to review and take action.');
     }
 }

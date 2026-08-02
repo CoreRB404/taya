@@ -98,7 +98,7 @@
                                          class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 py-1"
                                          style="display: none;">
                                          
-                                        <button @click="$dispatch('open-edit-user-modal', {{ Illuminate\Support\Js::from(['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role, 'facility_id' => $user->facility_id, 'is_active' => $user->is_active, 'mfa_enabled' => $user->mfa_enabled]) }})" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <button @click="$dispatch('open-edit-user-modal', {{ Illuminate\Support\Js::from(['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role, 'facility_id' => $user->facility_id, 'is_active' => $user->is_active]) }})" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Edit User
                                         </button>
                                         @if($user->id !== auth()->id())
@@ -224,7 +224,6 @@
         userRole: '',
         userFacilityId: '',
         isActive: true,
-        mfaEnabled: true,
         openEdit(user) {
             this.userId = user.id;
             this.userName = user.name;
@@ -232,7 +231,6 @@
             this.userRole = user.role;
             this.userFacilityId = user.facility_id;
             this.isActive = user.is_active;
-            this.mfaEnabled = user.mfa_enabled;
             this.show = true;
         }
      }"
@@ -285,16 +283,11 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div>
                         <label class="inline-flex items-center gap-2 text-sm text-gray-700">
                             <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" name="is_active" value="1" x-model="isActive" class="rounded border-gray-300 text-taya-accent focus:ring-taya-accent">
                             Active account
-                        </label>
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                            <input type="hidden" name="mfa_enabled" value="0">
-                            <input type="checkbox" name="mfa_enabled" value="1" x-model="mfaEnabled" class="rounded border-gray-300 text-taya-accent focus:ring-taya-accent">
-                            MFA enabled
                         </label>
                     </div>
                 </div>
