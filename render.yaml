@@ -3,6 +3,7 @@ services:
     name: taya-app
     runtime: docker
     plan: free
+    region: singapore
     dockerfilePath: ./Dockerfile
     healthCheckPath: /up
     autoDeploy: true
