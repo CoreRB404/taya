@@ -6,7 +6,7 @@
         </div>
     @endif
 
-    <div class="text-center mb-8">
+    <div class="mb-6 text-center">
         <h2 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em;">Welcome back</h2>
         <p style="color: rgba(255,255,255,0.55); font-size: 0.875rem; margin-top: 0.25rem;">Sign in to access your dashboard</p>
     </div>
@@ -17,7 +17,7 @@
         @csrf
 
         <!-- Email Address -->
-        <div class="mb-5">
+        <div class="mb-4">
             <label for="email" class="block mb-2" style="color: rgba(255,255,255,0.85); font-size: 0.875rem; font-weight: 500;">Email Address</label>
             <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0 1rem; transition: all 0.25s ease;" class="input-wrapper">
                 <svg class="w-5 h-5" style="color: rgba(255,255,255,0.4); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Password -->
-        <div class="mb-5">
+        <div class="mb-4">
             <label for="password" class="block mb-2" style="color: rgba(255,255,255,0.85); font-size: 0.875rem; font-weight: 500;">Password</label>
             <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0 1rem; transition: all 0.25s ease;" class="input-wrapper">
                 <svg class="w-5 h-5" style="color: rgba(255,255,255,0.4); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@
         </div>
 
         <!-- Remember Me -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <label for="remember_me" class="inline-flex items-center cursor-pointer">
                 <input id="remember_me" type="checkbox" name="remember"
                     class="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0 transition">

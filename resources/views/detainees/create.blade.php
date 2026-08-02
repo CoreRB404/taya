@@ -3,8 +3,8 @@
 @section('header', 'Add New Detainee')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
-    <div class="mb-6 flex items-center justify-between">
+<div class="mx-auto max-w-3xl">
+    <div class="mb-4 flex items-center justify-between">
         <a href="{{ route('detainees.index') }}" class="text-gray-500 hover:text-gray-700 flex items-center gap-2 text-sm font-medium transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Back to Database
@@ -12,15 +12,15 @@
     </div>
 
     <div class="glass-panel overflow-hidden">
-        <div class="p-6 sm:p-8 border-b border-gray-100 bg-gray-50/50">
+        <div class="border-b border-gray-100 bg-gray-50/50 p-4 sm:p-6">
             <h2 class="text-xl font-bold text-gray-900">Detainee Intake Form</h2>
             <p class="mt-1 text-sm text-gray-500">Enter the initial commitment details. The system will automatically compute phase compliance deadlines and overstay alerts upon saving.</p>
         </div>
 
-        <form action="{{ route('detainees.store') }}" method="POST" class="p-6 sm:p-8 space-y-6">
+        <form action="{{ route('detainees.store') }}" method="POST" class="space-y-5 p-4 sm:p-6">
             @csrf
 
-            <div class="space-y-6">
+            <div class="space-y-5">
                 <!-- Personal Info -->
                 <div>
                     <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
@@ -33,7 +33,7 @@
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <!-- Facility -->
                     <div>
                         <label for="facility_id" class="block text-sm font-medium text-gray-700">Detention Facility</label>
@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
                         <label for="bail_amount" class="block text-sm font-medium text-gray-700">Bail Amount</label>
                         <div class="mt-1">
@@ -124,7 +124,7 @@
                         <p class="mt-1 text-xs text-gray-500">These details can be used to share the tracking code with the detainee’s family.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="relative_name" class="block text-sm font-medium text-gray-700">Relative Name</label>
                             <input type="text" name="relative_name" id="relative_name" value="{{ old('relative_name') }}"
@@ -143,7 +143,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="relative_email" class="block text-sm font-medium text-gray-700">Relative Email</label>
                             <input type="email" name="relative_email" id="relative_email" value="{{ old('relative_email') }}"
@@ -193,7 +193,7 @@
                 </div>
             </div>
 
-            <div class="pt-5 mt-6 border-t border-gray-200 flex justify-end gap-3">
+            <div class="flex flex-col-reverse gap-2 border-t border-gray-200 pt-5 sm:flex-row sm:justify-end">
                 <a href="{{ route('detainees.index') }}" class="btn-secondary">
                     Cancel
                 </a>

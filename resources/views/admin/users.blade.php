@@ -3,28 +3,30 @@
 @section('header', 'User Management')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">System Users</h2>
-        <div class="flex flex-wrap gap-2">
-            <form id="bulk-reset-form" action="{{ route('admin.users.bulk-reset-passwords') }}" method="POST" class="flex items-center">
+<input id="create-user-toggle" type="checkbox" class="peer sr-only"
+       aria-label="Toggle new user form"
+       {{ $errors->createUser->any() ? 'checked' : '' }}>
+<div class="page-stack">
+    <div class="page-heading">
+        <div><h2 class="page-title">System Users</h2><p class="page-subtitle">Manage access, assignments, and account security.</p></div>
+        <div class="mobile-actions sm:w-auto sm:flex-row">
+            <form id="bulk-reset-form" action="{{ route('admin.users.bulk-reset-passwords') }}" method="POST" class="flex w-full sm:w-auto">
                 @csrf
-                <div id="bulk-reset-user-inputs"></div>
-                <button id="bulk-reset-button" type="submit" disabled class="btn-secondary flex items-center gap-2 border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400 disabled:opacity-70 disabled:hover:bg-white">
+                <button id="bulk-reset-button" type="submit" disabled class="btn-secondary flex w-full items-center justify-center gap-2 border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400 disabled:opacity-70 disabled:hover:bg-white sm:w-auto">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     Bulk Reset Passwords (<span id="bulk-reset-count">0</span>)
                 </button>
             </form>
-            <button @click="$dispatch('open-modal', 'create-user')" class="btn-primary flex items-center gap-2">
+            <label for="create-user-toggle" class="btn-primary flex w-full cursor-pointer items-center justify-center gap-2 sm:w-auto">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Add New User
-            </button>
+            </label>
         </div>
     </div>
 
     <div class="glass-panel overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+        <div class="table-scroll">
+            <table class="data-table responsive-table">
                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-4 font-semibold w-12">
@@ -39,19 +41,19 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($users as $user)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4">
+                        <tr class="data-row">
+                            <td data-label="Select">
                                 @if($user->id !== auth()->id())
-                                <input type="checkbox" value="{{ $user->id }}" data-user-checkbox class="user-checkbox rounded border-gray-300 text-taya-accent focus:ring-taya-accent">
+                                <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulk-reset-form" data-user-checkbox class="user-checkbox rounded border-gray-300 text-taya-accent focus:ring-taya-accent">
                                 @endif
                             </td>
-                            <td class="px-6 py-4">
+                            <td data-label="User">
                                 <div class="flex flex-col">
                                     <span class="font-bold text-gray-900">{{ $user->name }}</span>
                                     <span class="text-xs text-gray-500">{{ $user->email }}</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Role" class="whitespace-nowrap">
                                 @php
                                     $roleColor = match($user->role) {
                                         'admin' => 'purple',
@@ -66,20 +68,21 @@
                                     {{ ucwords(str_replace('_', ' ', $user->role)) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            <td data-label="Facility" class="whitespace-nowrap text-gray-600">
                                 {{ $user->facility ? $user->facility->name : 'System Wide' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            <td data-label="Joined" class="whitespace-nowrap text-gray-600">
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <td data-label="Action" class="whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
                                 <button
                                     type="button"
                                     data-change-password
                                     data-action="{{ route('admin.users.change-password', $user) }}"
                                     data-user-id="{{ $user->id }}"
                                     data-user-name="{{ $user->name }}"
-                                    class="mr-2 inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                                    class="inline-flex min-h-9 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                                 >
                                     Change Password
                                 </button>
@@ -120,6 +123,7 @@
                                         @endif
                                     </div>
                                 </div>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -141,23 +145,17 @@
     </div>
 </div>
 
-<!-- Create User Modal (AlpineJS driven) -->
-<div x-data="{ show: false, showPassword: false }"
-     x-show="show"
-     x-transition.opacity.duration.300ms
-     x-on:open-modal.window="if ($event.detail === 'create-user') $nextTick(() => { show = true })"
-     x-on:keydown.escape.window="if (show) { show = false; $event.stopPropagation(); }"
-     style="display: none; z-index: 9999;"
-     class="fixed inset-0 flex items-center justify-center p-4 bg-gray-900/75 backdrop-blur-sm overflow-y-auto"
+<!-- Create User Modal (CSS controlled so it remains reliable without JavaScript) -->
+<div class="fixed inset-0 z-[9999] hidden items-center justify-center overflow-y-auto bg-gray-900/75 p-3 backdrop-blur-sm peer-checked:flex sm:p-4"
      aria-labelledby="modal-title" role="dialog" aria-modal="true"
-     @mousedown.self="show = false">
+>
     
     <!-- Modal Panel -->
-    <div style="width: 100%; max-width: 32rem;" class="relative bg-white rounded-2xl text-left shadow-2xl overflow-hidden transform transition-all my-8">
+    <div class="modal-panel">
             
             <form action="{{ route('admin.users.store') }}" method="POST">
                 @csrf
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="modal-body">
                     <div class="mb-5">
                         <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Provision New User</h3>
                         <p class="text-sm text-gray-500 mt-1">Create a new system account and set its initial password.</p>
@@ -166,50 +164,60 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input type="text" name="name" required class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                            <input type="text" name="name" value="{{ old('name') }}" required class="form-control mt-1">
+                            @error('name', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" class="form-control mt-1">
+                            @error('email', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Password</label>
                             <div class="relative mt-1">
-                                <input :type="showPassword ? 'text' : 'password'" id="create_user_password" name="password" required minlength="12" autocomplete="new-password" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 pr-16 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
-                                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center px-3 text-xs font-medium text-gray-500 hover:text-gray-700" :aria-label="showPassword ? 'Hide password' : 'Show password'" x-text="showPassword ? 'Hide' : 'Show'"></button>
+                                <input type="password" id="create_user_password" name="password" required minlength="12" autocomplete="new-password" class="form-control">
                             </div>
                             <p class="mt-1 text-xs text-gray-500">Use 12+ characters with upper/lowercase letters, a number, and a symbol.</p>
+                            @error('password', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                            <input type="password" name="password_confirmation" required minlength="12" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                            <input type="password" name="password_confirmation" required minlength="12" class="form-control mt-1">
+                            @error('password_confirmation', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Role</label>
-                            <select name="role" required class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                            <select name="role" required class="form-control mt-1">
                                 @foreach(\App\Enums\UserRole::assignable() as $role)
-                                    <option value="{{ $role->value }}">{{ $role->label() }}</option>
+                                    <option value="{{ $role->value }}" {{ old('role') === $role->value ? 'selected' : '' }}>{{ $role->label() }}</option>
                                 @endforeach
                             </select>
+                            @error('role', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Facility Assignment (Optional for non-BJMP)</label>
-                            <select name="facility_id" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                            <select name="facility_id" class="form-control mt-1">
                                 <option value="">System Wide / None</option>
                                 @foreach($facilities as $facility)
-                                    <option value="{{ $facility->id }}">{{ $facility->name }}</option>
+                                    <option value="{{ $facility->id }}" {{ (string) old('facility_id') === (string) $facility->id ? 'selected' : '' }}>{{ $facility->name }}</option>
                                 @endforeach
                             </select>
+                            @error('facility_id', 'createUser')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
-                    <button type="submit" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-taya-accent text-base font-medium text-white hover:bg-taya-accent-dark focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                <div class="flex flex-col-reverse gap-2 border-t border-gray-100 bg-gray-50 px-5 py-3 sm:flex-row sm:justify-end">
+                    <button type="submit" class="btn-primary w-full justify-center sm:w-auto">
                         Create Account
                     </button>
-                    <button type="button" @click="show = false" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <label for="create-user-toggle" class="btn-secondary w-full cursor-pointer justify-center sm:w-auto">
                         Cancel
-                    </button>
+                    </label>
                 </div>
             </form>
         </div>
@@ -239,14 +247,14 @@
      x-on:open-edit-user-modal.window="if ($event.detail) { $nextTick(() => { openEdit($event.detail); }) }"
      x-on:keydown.escape.window="if (show) { show = false; $event.stopPropagation(); }"
      style="display: none; z-index: 9999;"
-     class="fixed inset-0 flex items-center justify-center p-4 bg-gray-900/75 backdrop-blur-sm overflow-y-auto"
+     class="fixed inset-0 flex items-center justify-center overflow-y-auto bg-gray-900/75 p-3 backdrop-blur-sm sm:p-4"
      aria-labelledby="modal-title" role="dialog" aria-modal="true"
      @mousedown.self="show = false">
-    <div style="width: 100%; max-width: 32rem;" class="relative bg-white rounded-2xl text-left shadow-2xl overflow-hidden transform transition-all my-8">
+    <div class="modal-panel">
         <form :action="'/admin/users/' + userId" method="POST">
             @csrf
             @method('PUT')
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="modal-body">
                 <div class="mb-5">
                     <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Edit User</h3>
                     <p class="text-sm text-gray-500 mt-1">Update name, email, role, or facility assignment.</p>
@@ -255,17 +263,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" name="name" x-model="userName" required class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                        <input type="text" name="name" x-model="userName" required class="form-control mt-1">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" name="email" x-model="userEmail" required class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                        <input type="email" name="email" x-model="userEmail" required class="form-control mt-1">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Role</label>
-                        <select name="role" x-model="userRole" required class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                        <select name="role" x-model="userRole" required class="form-control mt-1">
                             @foreach(\App\Enums\UserRole::assignable() as $role)
                                 <option value="{{ $role->value }}">{{ $role->label() }}</option>
                             @endforeach
@@ -275,7 +283,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Facility Assignment (Optional)</label>
-                        <select name="facility_id" x-model="userFacilityId" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-taya-accent focus:ring-1 focus:ring-taya-accent transition-colors">
+                        <select name="facility_id" x-model="userFacilityId" class="form-control mt-1">
                             <option value="">System Wide / None</option>
                             @foreach($facilities as $facility)
                                 <option value="{{ $facility->id }}">{{ $facility->name }}</option>
@@ -292,11 +300,11 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
-                <button type="submit" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-taya-accent text-base font-medium text-white hover:bg-taya-accent-dark focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            <div class="flex flex-col-reverse gap-2 border-t border-gray-100 bg-gray-50 px-5 py-3 sm:flex-row sm:justify-end">
+                <button type="submit" class="btn-primary w-full justify-center sm:w-auto">
                     Save Changes
                 </button>
-                <button type="button" @click="show = false" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                <button type="button" @click="show = false" class="btn-secondary w-full justify-center sm:w-auto">
                     Cancel
                 </button>
             </div>
@@ -308,21 +316,21 @@
 <dialog
     id="change-password-dialog"
     data-open-on-load="{{ $errors->changePassword->any() ? 'true' : 'false' }}"
-    class="rounded-2xl bg-transparent p-0 shadow-2xl backdrop:bg-gray-900/75 backdrop:backdrop-blur-sm"
-    style="position: fixed; left: 50%; top: 50%; width: min(32rem, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); margin: 0; transform: translate(-50%, -50%);"
+    class="rounded-xl bg-transparent p-0 shadow-2xl backdrop:bg-gray-900/75 backdrop:backdrop-blur-sm"
+    style="position: fixed; left: 50%; top: 50%; width: min(30rem, calc(100vw - 1.5rem)); max-height: calc(100dvh - 1.5rem); margin: 0; transform: translate(-50%, -50%);"
     aria-labelledby="change-password-title"
 >
     <form
         id="change-password-form"
         action="{{ old('change_password_user_id') ? url('/admin/users/'.old('change_password_user_id').'/change-password') : '#' }}"
         method="POST"
-        class="overflow-hidden rounded-2xl bg-white"
+        class="max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-xl bg-white"
     >
         @csrf
         <input id="change-password-user-id" type="hidden" name="change_password_user_id" value="{{ old('change_password_user_id') }}">
         <input id="change-password-user-name-input" type="hidden" name="change_password_user_name" value="{{ old('change_password_user_name') }}">
 
-        <div class="px-6 py-5">
+        <div class="p-5 sm:p-6">
             <h3 id="change-password-title" class="text-lg font-bold text-gray-900">Change Password</h3>
             <p class="mt-1 text-sm text-gray-500">User: <span id="change-password-user-name" class="font-semibold text-gray-700">{{ old('change_password_user_name') }}</span></p>
 
@@ -339,23 +347,23 @@
 
             <div class="mt-5">
                 <label for="current_password" class="block text-sm font-medium text-gray-700">Your admin password</label>
-                <input type="password" id="current_password" name="current_password" required autocomplete="current-password" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm focus:border-taya-accent focus:ring-taya-accent">
+                <input type="password" id="current_password" name="current_password" required autocomplete="current-password" class="form-control mt-1">
             </div>
 
             <div class="mt-4">
                 <label for="new_password" class="block text-sm font-medium text-gray-700">New password</label>
-                <input type="password" id="new_password" name="password" required minlength="12" autocomplete="new-password" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm focus:border-taya-accent focus:ring-taya-accent">
+                <input type="password" id="new_password" name="password" required minlength="12" autocomplete="new-password" class="form-control mt-1">
             </div>
 
             <div class="mt-4">
                 <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700">Confirm new password</label>
-                <input type="password" id="new_password_confirmation" name="password_confirmation" required minlength="12" autocomplete="new-password" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm focus:border-taya-accent focus:ring-taya-accent">
+                <input type="password" id="new_password_confirmation" name="password_confirmation" required minlength="12" autocomplete="new-password" class="form-control mt-1">
             </div>
 
             <p class="mt-3 text-xs text-gray-500">Use at least 12 characters with upper/lowercase letters, a number, and a symbol.</p>
         </div>
 
-        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 bg-gray-50 px-6 py-4 sm:flex-row sm:justify-end">
+        <div class="flex flex-col-reverse gap-2 border-t border-gray-100 bg-gray-50 px-5 py-3 sm:flex-row sm:justify-end">
             <button type="button" data-close-change-password class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
             <button type="submit" class="inline-flex justify-center rounded-lg bg-taya-accent px-4 py-2 text-sm font-medium text-white hover:bg-taya-accent-dark">Update Password</button>
         </div>

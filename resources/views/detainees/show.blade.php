@@ -3,15 +3,25 @@
 @section('header', 'Detainee Profile')
 
 @section('content')
-<div class="space-y-6 max-w-7xl mx-auto">
+<div class="page-stack mx-auto max-w-7xl">
+    @php
+        $totalPhases = $detainee->phases()->count();
+        $completedPhases = $detainee->phases()->where('completed', true)->count();
+        $allPhasesComplete = $totalPhases > 0 && $completedPhases === $totalPhases;
+        $hasUnresolvedAlerts = $detainee->alerts()->whereNull('resolved_at')->exists();
+        $requiresOverride = !$allPhasesComplete || $hasUnresolvedAlerts;
+    @endphp
+
     <!-- Header with Actions -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+    <div class="glass-panel p-4 sm:p-5">
+      <input id="release-override-toggle" type="checkbox" class="peer sr-only" aria-hidden="true">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div class="min-w-0">
             <a href="{{ route('detainees.index') }}" class="text-gray-500 hover:text-gray-700 flex items-center gap-2 text-sm font-medium transition-colors mb-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Back to Database
             </a>
-            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <h2 class="flex flex-wrap items-center gap-2 text-xl font-bold text-gray-900 sm:text-2xl">
                 {{ $detainee->full_name }}
                 @if($detainee->status === 'active')
                     <span class="badge bg-green-100 text-green-800">Active</span>
@@ -21,7 +31,7 @@
             </h2>
             <p class="text-sm text-gray-500 mt-1">ID: {{ str_pad($detainee->id, 6, '0', STR_PAD_LEFT) }} | {{ $detainee->facility->name }}</p>
             @if($detainee->tracking_code)
-                <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-taya-accent/20 bg-taya-accent/10 px-3 py-1 text-sm font-medium text-taya-accent">
+                <div class="mt-2 inline-flex max-w-full flex-wrap items-center gap-x-2 rounded-full border border-taya-accent/20 bg-taya-accent/10 px-3 py-1 text-sm font-medium text-taya-accent">
                     <span>Tracking Code:</span>
                     <span class="font-semibold">{{ $detainee->tracking_code }}</span>
                 </div>
@@ -29,78 +39,93 @@
         </div>
         
         @can('update', $detainee)
-            <div class="flex gap-2">
-                <a href="{{ route('reports.detainee', $detainee) }}" target="_blank" class="btn-secondary">
+            <div class="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap sm:items-start sm:justify-end">
+                <a href="{{ route('reports.detainee', $detainee) }}" target="_blank" class="btn-secondary w-full sm:w-auto">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z" /></svg>
                     Download PDF
                 </a>
-                <a href="{{ route('detainees.edit', $detainee) }}" class="btn-secondary">
+                <a href="{{ route('detainees.edit', $detainee) }}" class="btn-secondary w-full sm:w-auto">
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                     Edit Details
                 </a>
                 @if($detainee->status === 'active')
-                    @php
-                        $totalPhases = $detainee->phases()->count();
-                        $completedPhases = $detainee->phases()->where('completed', true)->count();
-                        $allPhasesComplete = $totalPhases > 0 && $completedPhases === $totalPhases;
-                        $hasUnresolvedAlerts = $detainee->alerts()->whereNull('resolved_at')->exists();
-                        $requiresOverride = !$allPhasesComplete || $hasUnresolvedAlerts;
-                    @endphp
-                    <div x-data="{ showReleaseForm: false }" class="space-y-2">
+                    <div class="col-span-2 sm:col-auto">
                         @if(!$requiresOverride)
                             <form action="{{ route('detainees.release', $detainee) }}" method="POST" onsubmit="return confirm('Mark this detainee as released? This will resolve any open alerts automatically.');">
                                 @csrf
-                                <button type="submit" class="btn-secondary text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                                <button type="submit" class="btn-secondary w-full text-amber-600 hover:bg-amber-50 hover:text-amber-700 sm:w-auto">
+                                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                                     Mark as Released
                                 </button>
                             </form>
                         @else
-                            <div class="space-y-2">
-                                <button type="button" @click="showReleaseForm = true" class="btn-secondary text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                                <label for="release-override-toggle" class="btn-secondary w-full cursor-pointer text-amber-600 hover:bg-amber-50 hover:text-amber-700 sm:w-auto">
+                                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                                     Mark as Released (Override)
-                                </button>
-                                <form action="{{ route('detainees.release', $detainee) }}" method="POST" x-show="showReleaseForm" x-cloak class="rounded-xl border border-amber-200 bg-amber-50 p-4 transition duration-150">
-                                    @csrf
-                                    <p class="text-sm font-semibold text-amber-900">Override release requires password confirmation.</p>
-                                    @if($hasUnresolvedAlerts && !$allPhasesComplete)
-                                        <p class="text-xs text-amber-700 mt-1">Detainee has completed {{ $completedPhases }} of {{ $totalPhases }} phases and has unresolved alerts.</p>
-                                    @elseif($hasUnresolvedAlerts)
-                                        <p class="text-xs text-amber-700 mt-1">Detainee has unresolved alerts.</p>
-                                    @else
-                                        <p class="text-xs text-amber-700 mt-1">Detainee has completed {{ $completedPhases }} of {{ $totalPhases }} phases.</p>
-                                    @endif
-                                    <div class="mt-4">
-                                        <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
-                                        <input id="current_password" name="current_password" type="password" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-taya-accent focus:ring-taya-accent text-sm" autocomplete="current-password">
-                                        @error('current_password')
-                                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                    <div class="mt-4 flex gap-2">
-                                        <button type="submit" class="btn-secondary bg-amber-600 hover:bg-amber-700 text-white py-2 px-4">Confirm Release</button>
-                                        <button type="button" @click="showReleaseForm = false" class="btn-secondary bg-gray-100 text-gray-700 py-2 px-4">Cancel</button>
-                                    </div>
-                                </form>
-                            </div>
+                                </label>
                         @endif
                     </div>
-                    <form action="{{ route('detainees.destroy', $detainee) }}" method="POST" onsubmit="return confirm('Archive this record?');">
+                    <form action="{{ route('detainees.destroy', $detainee) }}" method="POST" class="col-span-2 sm:col-auto" onsubmit="return confirm('Archive this record?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn-secondary text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <button type="submit" class="btn-secondary w-full text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto">
+                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M9 4h6l1 4H8l1-4zm-2 4v11a2 2 0 002 2h6a2 2 0 002-2V8" /></svg>
                             Archive
                         </button>
                     </form>
                 @endif
             </div>
         @endcan
+      </div>
+
+      @can('update', $detainee)
+        @if($detainee->status === 'active' && $requiresOverride)
+          <form action="{{ route('detainees.release', $detainee) }}" method="POST" class="mt-4 hidden rounded-xl border border-amber-200 bg-amber-50 p-4 peer-checked:block">
+            @csrf
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start gap-3">
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-semibold text-amber-950">Confirm override release</h3>
+                    <p class="mt-1 text-sm text-amber-800">
+                      @if($hasUnresolvedAlerts && !$allPhasesComplete)
+                        Only {{ $completedPhases }} of {{ $totalPhases }} phases are complete, and unresolved alerts remain.
+                      @elseif($hasUnresolvedAlerts)
+                        This detainee still has unresolved alerts.
+                      @else
+                        Only {{ $completedPhases }} of {{ $totalPhases }} phases are complete.
+                      @endif
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="grid w-full gap-2 sm:grid-cols-[minmax(14rem,1fr)_auto_auto] lg:w-auto">
+                <div>
+                  <label for="release_current_password" class="sr-only">Your administrator password</label>
+                  <input id="release_current_password" name="current_password" type="password" required class="form-control" placeholder="Administrator password" autocomplete="current-password">
+                  @error('current_password')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                  @enderror
+                </div>
+                <label for="release-override-toggle" class="btn-secondary cursor-pointer">Cancel</label>
+                <button type="submit" class="btn-primary bg-amber-600 hover:bg-amber-700 focus:ring-amber-500">Release</button>
+              </div>
+            </div>
+          </form>
+        @endif
+      @endcan
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <!-- Left Column: Primary Info & Overstay -->
-        <div class="xl:col-span-1 space-y-6">
+        <div class="space-y-4 xl:col-span-1">
             
             <!-- Overstay Alert Card -->
             <div class="glass-panel overflow-hidden border-2 @if($latestAlert && $latestAlert->alert_level === 'critical') border-red-500 @elseif($latestAlert && $latestAlert->alert_level === 'at_risk') border-orange-500 @else border-transparent @endif">
-                <div class="p-6">
+                <div class="p-4 sm:p-5">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Overstay Computation</h3>
                     
                     <div class="flex items-center justify-between mb-2">
@@ -178,9 +203,11 @@
                         
                         <div class="mt-6 pt-4 border-t border-gray-100">
                             @if(!$latestAlert->resolved_at)
-                                <div x-data="{ showOverrideForm: false }">
+                                <div>
                                     <form action="{{ route('alerts.resolve', $latestAlert) }}" method="POST" onsubmit="return confirm('Resolve this alert?');">
                                         @csrf
+                                        <input id="alert-resolution-override-toggle" type="checkbox" class="peer sr-only"
+                                               aria-label="Toggle alert resolution override form">
                                         @if($allPhasesComplete)
                                             <button type="submit" class="w-full btn-primary bg-green-600 hover:bg-green-700 shadow-green-500/30 py-2 flex justify-center items-center gap-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -192,12 +219,12 @@
                                                 <p class="mt-2">The detainee has only completed {{ $completedPhases }} of {{ $totalPhases }} phases.</p>
                                             </div>
 
-                                            <button type="button" @click="showOverrideForm = true" class="w-full btn-primary bg-amber-600 hover:bg-amber-700 shadow-amber-500/30 py-2 flex justify-center items-center gap-2">
+                                            <label for="alert-resolution-override-toggle" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                 Override and Resolve Alert
-                                            </button>
+                                            </label>
 
-                                            <div x-show="showOverrideForm" x-cloak class="mt-4 rounded-xl border border-amber-200 bg-white p-4 shadow-sm">
+                                            <div class="mt-4 hidden rounded-xl border border-amber-200 bg-white p-4 shadow-sm peer-checked:block">
                                                 <div class="space-y-4">
                                                     <div>
                                                         <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
@@ -206,12 +233,12 @@
                                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                                         @enderror
                                                     </div>
-                                                    <div class="flex items-center gap-2">
+                                                    <div class="flex flex-col-reverse gap-2 sm:flex-row">
                                                         <button type="submit" class="w-full btn-primary bg-amber-600 hover:bg-amber-700 shadow-amber-500/30 py-2 flex justify-center items-center gap-2">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                             Confirm Override Resolve
                                                         </button>
-                                                        <button type="button" @click="showOverrideForm = false" class="w-full btn-secondary bg-gray-100 text-gray-700 border-gray-300 py-2">Cancel</button>
+                                                        <label for="alert-resolution-override-toggle" class="btn-secondary w-full cursor-pointer border-gray-300 bg-gray-100 py-2 text-center text-gray-700">Cancel</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -230,7 +257,7 @@
             </div>
 
             <!-- Case Details -->
-            <div class="glass-panel p-6">
+            <div class="glass-panel p-4 sm:p-5">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Case Details</h3>
                 <dl class="space-y-4">
                     <div>
@@ -267,11 +294,11 @@
         </div>
 
         <!-- Middle Column: Phase Tracker & Legal Actions -->
-        <div class="xl:col-span-2 space-y-6">
+        <div class="space-y-4 xl:col-span-2">
             
             <!-- Phase Compliance Tracker Widget -->
             <div class="glass-panel overflow-hidden">
-                <div class="p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div class="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 p-4">
                     <h3 class="text-lg font-semibold text-gray-900">Phase Compliance Tracker</h3>
                     <span class="badge bg-indigo-100 text-indigo-800">4 Stages</span>
                 </div>
@@ -285,12 +312,13 @@
                             $daysOverdue = $isOverdue ? (int) $phase->due_date->diffInDays(now()) : 0;
                             $daysLeft = !$phase->completed && !$isOverdue ? (int) now()->diffInDays($phase->due_date) : 0;
                         @endphp
-                        <div class="p-5" x-data="{ showReasonForm: false, showDetails: false }">
+                        <div class="p-4" x-data="{ showReasonForm: false }">
+                            <input id="phase-details-{{ $phase->id }}" type="checkbox" class="peer sr-only" aria-label="Toggle details for phase {{ $phase->phase_number }}">
                             {{-- Phase Header Row --}}
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div class="flex items-center gap-3">
+                            <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                                <div class="flex min-w-0 items-center gap-3">
                                     {{-- Status Icon --}}
-                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-{{ $statusColor }}-100 text-{{ $statusColor }}-600 shrink-0">
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-{{ $statusColor }}-100 text-{{ $statusColor }}-600">
                                         @if($phase->completed)
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         @elseif($isOverdue)
@@ -300,8 +328,8 @@
                                         @endif
                                     </div>
                                     {{-- Phase Title --}}
-                                    <div>
-                                        <h4 class="font-bold text-gray-900 text-base">Phase {{ $phase->phase_number }}: {{ $phase->phase_name }}</h4>
+                                    <div class="min-w-0">
+                                        <h4 class="text-sm font-bold text-gray-900 sm:text-base">Phase {{ $phase->phase_number }}: {{ $phase->phase_name }}</h4>
                                         <p class="text-xs text-gray-500 mt-0.5">
                                             Due: {{ $phase->due_date->format('F d, Y') }}
                                             @if($phase->completed)
@@ -319,27 +347,27 @@
                                 </div>
                                 
                                 {{-- Status Badge + View Details Button --}}
-                                <div class="flex items-center gap-2 ml-13 sm:ml-0">
+                                <div class="flex items-center justify-between gap-2 sm:justify-end">
                                     @if($phase->completed)
                                         <span class="badge bg-green-100 text-green-800 text-xs">✓ Completed</span>
                                     @elseif($isOverdue)
-                                        <span class="badge bg-red-100 text-red-800 text-xs animate-pulse">⚠ Overdue {{ $daysOverdue }}d</span>
+                                        <span class="badge bg-red-100 text-red-800 text-xs">⚠ Overdue {{ $daysOverdue }}d</span>
                                     @else
                                         <span class="badge bg-blue-100 text-blue-800 text-xs">◷ Upcoming</span>
                                     @endif
-                                    <button @click="showDetails = !showDetails" 
-                                            class="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1">
-                                        <svg class="w-4 h-4 transition-transform" :class="showDetails && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                        <span x-text="showDetails ? 'Hide Details' : 'View Details'">View Details</span>
-                                    </button>
+                                    <label for="phase-details-{{ $phase->id }}"
+                                           class="btn-secondary flex cursor-pointer items-center gap-1 px-3 py-1.5 text-xs">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        View / Hide Details
+                                    </label>
                                 </div>
                             </div>
 
                             {{-- Expandable Details Panel --}}
-                            <div x-show="showDetails" x-collapse x-cloak class="mt-4 ml-0 sm:ml-13">
+                            <div class="mt-3 hidden peer-checked:block sm:ml-12">
                                 <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
                                     {{-- Phase Info Grid --}}
-                                    <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm border-b border-gray-100 bg-gray-50/50">
+                                    <div class="grid grid-cols-2 gap-3 border-b border-gray-100 bg-gray-50/50 p-3 text-sm sm:grid-cols-4">
                                         <div>
                                             <span class="block text-xs text-gray-500 uppercase tracking-wider font-medium">Allowed Time</span>
                                             <span class="font-bold text-gray-900">{{ $phase->day_count }} days</span>
@@ -376,7 +404,7 @@
 
                                     {{-- Delay Justification (always visible when exists, even if completed) --}}
                                     @if($phase->flag_reason)
-                                        <div class="p-4 bg-amber-50 border-b border-amber-100">
+                                        <div class="border-b border-amber-100 bg-amber-50 p-3">
                                             <div class="flex items-start gap-3">
                                                 <div class="p-1.5 bg-amber-100 rounded-lg shrink-0">
                                                     <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -388,7 +416,7 @@
                                             </div>
                                         </div>
                                     @elseif($isOverdue && !$phase->flag_reason)
-                                        <div class="p-4 bg-red-50 border-b border-red-100">
+                                        <div class="border-b border-red-100 bg-red-50 p-3">
                                             <div class="flex items-center gap-2 text-sm text-red-700">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>
                                                 <span class="font-semibold">No justification provided yet.</span> This phase is overdue and requires a reason for the delay.
@@ -398,7 +426,7 @@
 
                                     {{-- Actions --}}
                                     @if(!$phase->completed && auth()->user()->can('complete', $phase))
-                                        <div class="p-4 space-y-3">
+                                        <div class="space-y-3 p-3">
                                             <div class="flex flex-wrap items-center gap-2">
                                                 @if($isOverdue)
                                                     <button @click="showReasonForm = !showReasonForm" 
@@ -447,18 +475,21 @@
             </div>
 
             <!-- Documents -->
-            <div class="glass-panel overflow-hidden" x-data="{ openUpload: {{ $errors->hasAny(['file', 'doc_type', 'phase_number']) ? 'true' : 'false' }} }">
-                <div class="p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <div class="glass-panel overflow-hidden">
+                <input id="document-upload-toggle" type="checkbox" class="peer sr-only"
+                       aria-label="Toggle document upload form"
+                       {{ $errors->hasAny(['file', 'doc_type', 'phase_number']) ? 'checked' : '' }}>
+                <div class="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 p-4">
                     <h3 class="text-lg font-semibold text-gray-900">Court Documents</h3>
                     @can('create', [\App\Models\Document::class, $detainee])
-                        <button @click="openUpload = !openUpload" class="btn-secondary text-sm py-1.5">
+                        <label for="document-upload-toggle" class="btn-secondary cursor-pointer py-1.5 text-sm">
                             Upload File
-                        </button>
+                        </label>
                     @endcan
                 </div>
 
                 <!-- Upload Form -->
-                <div x-show="openUpload" x-collapse class="border-b border-gray-100 bg-gray-50 p-5">
+                <div class="hidden border-b border-gray-100 bg-gray-50 p-4 peer-checked:block">
                     <form action="{{ route('detainees.documents.store', $detainee) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         @if(session('error'))
@@ -506,7 +537,7 @@
                             </div>
                         </div>
                         <div class="flex justify-end gap-2">
-                            <button type="button" @click="openUpload = false" class="btn-secondary py-1.5 px-3 text-sm">Cancel</button>
+                            <label for="document-upload-toggle" class="btn-secondary cursor-pointer px-3 py-1.5 text-sm">Cancel</label>
                             <button type="submit" class="btn-primary py-1.5 px-3 text-sm">Upload</button>
                         </div>
                     </form>
@@ -515,20 +546,20 @@
                 <!-- Document List -->
                 <ul class="divide-y divide-gray-100">
                     @forelse($detainee->documents as $doc)
-                        <li class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center gap-3">
+                        <li class="flex flex-col gap-3 p-4 transition-colors hover:bg-gray-50 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 uppercase">{{ str_replace('_', ' ', $doc->doc_type) }}</p>
-                                    <p class="text-xs text-gray-500">
+                                <div class="min-w-0">
+                                    <p class="break-words text-sm font-medium uppercase text-gray-900">{{ str_replace('_', ' ', $doc->doc_type) }}</p>
+                                    <p class="text-xs leading-5 text-gray-500">
                                         Uploaded by {{ $doc->uploadedByUser->name }} on {{ $doc->uploaded_at->format('M d, Y') }}
                                         @if($doc->phase_number) &bull; Phase {{ $doc->phase_number }} @endif
                                     </p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-end gap-2 sm:shrink-0">
                                 <a href="{{ route('detainees.documents.show', [$detainee, $doc]) }}" target="_blank" class="text-taya-accent hover:text-taya-accent-dark text-sm font-medium">Download</a>
                                 @can('delete', $doc)
                                     <form action="{{ route('detainees.documents.destroy', [$detainee, $doc]) }}" method="POST" class="inline" onsubmit="return confirm('Delete this document?');">
@@ -541,17 +572,17 @@
                             </div>
                         </li>
                     @empty
-                        <li class="p-6 text-center text-gray-500 text-sm">No documents uploaded yet.</li>
+                        <li class="p-5 text-center text-sm text-gray-500">No documents uploaded yet.</li>
                     @endforelse
                 </ul>
             </div>
 
             <!-- Legal Actions Log -->
             <div class="glass-panel overflow-hidden">
-                <div class="p-5 border-b border-gray-100 bg-gray-50/50">
+                <div class="border-b border-gray-100 bg-gray-50/50 p-4">
                     <h3 class="text-lg font-semibold text-gray-900">Legal Actions History</h3>
                 </div>
-                <div class="p-5">
+                <div class="p-4">
                     @forelse($detainee->legalActions as $action)
                         <div class="mb-4 last:mb-0 relative pl-4 border-l-2 border-taya-accent">
                             <div class="absolute w-2.5 h-2.5 bg-taya-accent rounded-full -left-[5px] top-1"></div>

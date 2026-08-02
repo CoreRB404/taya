@@ -3,7 +3,7 @@
 @section('header', 'Alert Management')
 
 @section('content')
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="page-stack mx-auto max-w-5xl">
     <div class="mb-4 flex items-center justify-between">
         <a href="{{ url()->previous() }}" class="text-gray-500 hover:text-gray-700 flex items-center gap-2 text-sm font-medium transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -18,7 +18,7 @@
 
     <!-- Alert Header Banner -->
     <div class="glass-panel overflow-hidden border-t-4 border-{{ $alert->color_class }}-500">
-        <div class="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex flex-col justify-between gap-4 p-4 sm:p-6 md:flex-row md:items-center">
             <div>
                 <div class="flex items-center gap-3 mb-2">
                     <span class="badge badge-{{ $alert->alert_level }} px-3 py-1 text-sm font-bold tracking-wider uppercase">
@@ -26,7 +26,7 @@
                     </span>
                     <span class="text-sm text-gray-500">Generated on {{ $alert->created_at->format('M d, Y H:i') }}</span>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-1">
+                <h2 class="mb-1 text-xl font-bold text-gray-900 sm:text-2xl">
                     <a href="{{ route('detainees.show', $alert->detainee) }}" class="hover:text-taya-accent transition-colors">
                         {{ $alert->detainee->full_name }}
                     </a>
@@ -34,7 +34,7 @@
                 <p class="text-gray-600">{{ $alert->detainee->facility->name }}</p>
             </div>
             
-            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 min-w-[250px]">
+            <div class="w-full rounded-lg border border-gray-100 bg-gray-50 p-4 md:w-auto md:min-w-[230px]">
                 <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Current Assignment</p>
                 @if($alert->assigned_to)
                     <div class="flex items-center justify-between">
@@ -51,12 +51,12 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <!-- Main Content -->
-        <div class="md:col-span-2 space-y-6">
+        <div class="space-y-4 md:col-span-2">
             
             <!-- Recommended Action -->
-            <div class="glass-panel p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100">
+            <div class="glass-panel border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5">
                 <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Recommended Legal Action
@@ -108,7 +108,7 @@
 
             <!-- Log Legal Action -->
             @if(!$alert->resolved_at && auth()->user()->can('assign', $alert))
-                <div class="glass-panel p-6">
+                <div class="glass-panel p-4 sm:p-5">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Log New Legal Action</h3>
                     <form action="{{ route('detainees.legal-actions.store', $alert->detainee) }}" method="POST" class="space-y-4">
                         @csrf
@@ -146,7 +146,7 @@
                 <div class="p-5 border-b border-gray-100 bg-gray-50/50">
                     <h3 class="text-lg font-semibold text-gray-900">Intervention History</h3>
                 </div>
-                <div class="p-6">
+                <div class="p-4 sm:p-5">
                     @forelse($alert->legalActions as $action)
                         <div class="mb-5 last:mb-0 relative pl-6 border-l-2 border-gray-200 pb-5 last:pb-0">
                             <div class="absolute w-3 h-3 bg-white border-2 border-taya-accent rounded-full -left-[7px] top-1.5"></div>
@@ -170,7 +170,7 @@
         </div>
 
         <!-- Sidebar (Actions & Overstay Details) -->
-        <div class="space-y-6">
+        <div class="space-y-4">
             
             <!-- Assignment (Admin only) -->
             @if(!$alert->resolved_at && (auth()->user()->canManageOperations() || auth()->user()->isLawyer()))

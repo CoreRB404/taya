@@ -19,6 +19,7 @@
             .login-bg {
                 background: linear-gradient(135deg, #0a1128 0%, #121e42 40%, #1c2e63 70%, #2a4185 100%);
                 min-height: 100vh;
+                min-height: 100dvh;
                 position: relative;
                 overflow: hidden;
             }
@@ -227,34 +228,47 @@
                 transition: transform 0.15s ease, box-shadow 0.15s ease;
             }
             .btn-search:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(59,130,246,0.18); }
+
+            @media (max-width: 639px) {
+                .login-bg::before { width: 320px; height: 320px; right: -35%; }
+                .login-bg::after { width: 280px; height: 280px; left: -35%; }
+                .grid-pattern { background-size: 42px 42px; }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .login-bg::before,
+                .login-bg::after,
+                .animate-card-in { animation: none !important; }
+                *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+            }
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="login-bg flex flex-col items-center justify-center px-4 sm:px-6">
+        <div class="login-bg flex flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-10">
             <div class="grid-pattern"></div>
 
             <!-- Logo & Branding -->
-            <div class="relative z-10 mb-8 text-center animate-card-in">
-                <div class="inline-flex items-center gap-3 mb-3">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <div class="relative z-10 mb-5 text-center animate-card-in sm:mb-7">
+                <div class="mb-2 inline-flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 sm:h-12 sm:w-12">
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
                         </svg>
                     </div>
-                    <span class="text-3xl font-bold tracking-tight text-white">TAYA</span>
+                    <span class="text-2xl font-bold tracking-tight text-white sm:text-3xl">TAYA</span>
                 </div>
                 <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem; letter-spacing: 0.025em;">Detainee Rights & Overstay Alert System</p>
             </div>
 
             <!-- Login Card -->
-            <div class="w-full sm:max-w-md login-card rounded-2xl p-8 relative z-10 animate-card-in stagger-1 transition-all duration-300">
+            <div class="login-card relative z-10 w-full max-w-md rounded-xl p-5 transition-all duration-300 animate-card-in stagger-1 sm:p-7">
                 {{ $slot }}
             </div>
 
             @stack('below-login')
 
             <!-- Footer -->
-            <div class="relative z-10 mt-8 text-center animate-card-in stagger-3">
+            <div class="relative z-10 mt-5 text-center animate-card-in stagger-3 sm:mt-7">
                 <p style="color: rgba(255,255,255,0.45); font-size: 0.75rem;">&copy; {{ date('Y') }} TAYA System. All rights reserved.</p>
             </div>
         </div>

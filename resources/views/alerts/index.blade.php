@@ -3,16 +3,16 @@
 @section('header', 'System Alert Queue')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">Alert Queue</h2>
+<div class="page-stack">
+    <div class="page-heading">
+        <div><h2 class="page-title">Alert Queue</h2><p class="page-subtitle">Prioritize and manage detainee-rights alerts.</p></div>
     </div>
 
     <!-- Filter Bar -->
-    <div class="glass-panel p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <form action="{{ route('alerts.index') }}" method="GET" class="flex flex-col sm:flex-row gap-4 w-full">
-            <input type="search" name="search" placeholder="Search detainee, charge, or alert id..." value="{{ request('search') }}" class="block w-full sm:w-80 rounded-lg border-gray-300 text-sm px-3 py-2" />
-            <select name="record_filter" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+    <div class="toolbar">
+        <form action="{{ route('alerts.index') }}" method="GET" class="filter-form">
+            <input type="search" name="search" placeholder="Search detainee, charge, or alert ID..." value="{{ request('search') }}" class="form-control sm:col-span-2 xl:min-w-80 xl:flex-1" />
+            <select name="record_filter" onchange="this.form.submit()" class="form-control xl:w-56">
                 <option value="" {{ request('record_filter') === null || request('record_filter') === '' ? 'selected' : '' }}>All Statuses and Alerts</option>
                 <optgroup label="Detainee status">
                     <option value="status:active" {{ request('record_filter') === 'status:active' ? 'selected' : '' }}>Active</option>
@@ -28,7 +28,7 @@
                 </optgroup>
             </select>
             
-            <select name="facility_id" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+            <select name="facility_id" onchange="this.form.submit()" class="form-control xl:w-56">
                 <option value="">All Facilities</option>
                 @foreach($facilities as $facility)
                     <option value="{{ $facility->id }}" {{ request('facility_id') == $facility->id ? 'selected' : '' }}>
@@ -47,8 +47,8 @@
 
     <!-- Alert Table -->
     <div class="glass-panel overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+        <div class="table-scroll">
+            <table class="data-table responsive-table">
                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-4 font-semibold">Severity</th>
@@ -61,13 +61,13 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($alerts as $alert)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        <tr class="data-row">
+                            <td data-label="Severity" class="whitespace-nowrap">
                                 <span class="badge badge-{{ $alert->alert_level }}">
                                     {{ strtoupper(str_replace('_', ' ', $alert->alert_level)) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td data-label="Detainee">
                                 <div class="flex flex-col">
                                     <a href="{{ route('alerts.show', $alert) }}" class="font-bold text-gray-900 hover:text-taya-accent transition-colors">
                                         {{ $alert->detainee->full_name }}
@@ -85,20 +85,20 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            <td data-label="Facility" class="whitespace-nowrap text-gray-600">
                                 {{ $alert->detainee->facility->name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Generated" class="whitespace-nowrap">
                                 <span class="text-gray-900">{{ $alert->created_at->format('M d, Y') }}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Assigned to" class="whitespace-nowrap">
                                 @if($alert->assigned_to)
                                     <span class="text-gray-900 font-medium">{{ $alert->assignedUser->name }}</span>
                                 @else
                                     <span class="text-gray-400 italic text-xs">Unassigned</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <td data-label="Action" class="whitespace-nowrap text-right">
                                 <a href="{{ route('alerts.show', $alert) }}" class="btn-secondary py-1.5 px-3 text-xs">
                                     Manage Alert
                                 </a>

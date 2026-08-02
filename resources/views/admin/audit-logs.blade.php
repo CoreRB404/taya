@@ -3,15 +3,15 @@
 @section('header', 'System Audit Logs')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">Audit Trail</h2>
+<div class="page-stack">
+    <div class="page-heading">
+        <div><h2 class="page-title">Audit Trail</h2><p class="page-subtitle">Review security-sensitive activity across the system.</p></div>
     </div>
 
     <!-- Filter Bar -->
-    <div class="glass-panel p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <form action="{{ route('admin.audit-logs.index') }}" method="GET" class="flex flex-col sm:flex-row gap-4 w-full">
-            <select name="action" class="rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+    <div class="toolbar">
+        <form action="{{ route('admin.audit-logs.index') }}" method="GET" class="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+            <select name="action" class="form-control sm:w-72">
                 <option value="">All Actions</option>
                 <option value="detainee_created" {{ request('action') === 'detainee_created' ? 'selected' : '' }}>Detainee Created</option>
                 <option value="phase_completed" {{ request('action') === 'phase_completed' ? 'selected' : '' }}>Phase Completed</option>
@@ -33,8 +33,8 @@
     </div>
 
     <div class="glass-panel overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+        <div class="table-scroll">
+            <table class="data-table responsive-table">
                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-4 font-semibold">Timestamp</th>
@@ -46,11 +46,11 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logs as $log)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-medium">
+                        <tr class="data-row">
+                            <td data-label="Timestamp" class="whitespace-nowrap font-medium text-gray-500">
                                 {{ $log->created_at->format('M d, Y H:i:s') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="User" class="whitespace-nowrap">
                                 @if($log->user)
                                     <span class="font-medium text-gray-900">{{ $log->user->name }}</span>
                                     <span class="text-xs text-gray-500 block">{{ $log->user->role }}</span>
@@ -58,12 +58,12 @@
                                     <span class="text-gray-400 italic">System</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Action" class="whitespace-nowrap">
                                 <span class="badge bg-gray-100 text-gray-800 font-mono text-[10px]">
                                     {{ $log->action }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-gray-700">
+                            <td data-label="Details" class="text-gray-700">
                                 {{ $log->description }}
                                 @if($log->detainee_id)
                                     <br>
@@ -72,7 +72,7 @@
                                     </a>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-400 font-mono">
+                            <td data-label="IP address" class="whitespace-nowrap font-mono text-xs text-gray-400">
                                 {{ $log->ip_address ?: '-' }}
                             </td>
                         </tr>

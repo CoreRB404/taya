@@ -3,9 +3,9 @@
 @section('header', 'Detainee Records')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">Detainee Database</h2>
+<div class="page-stack">
+    <div class="page-heading">
+        <div><h2 class="page-title">Detainee Database</h2><p class="page-subtitle">Search, review, and maintain custody records.</p></div>
         @can('create', \App\Models\Detainee::class)
             <a href="{{ route('detainees.create') }}" class="btn-primary flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -15,16 +15,16 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="glass-panel p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <form action="{{ route('detainees.index') }}" method="GET" class="flex flex-col sm:flex-row gap-4 w-full">
-            <div class="relative flex-1">
+    <div class="toolbar">
+        <form action="{{ route('detainees.index') }}" method="GET" class="filter-form">
+            <div class="relative sm:col-span-2 xl:min-w-80 xl:flex-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or charge..." class="pl-10 w-full rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or charge..." class="form-control pl-10">
             </div>
             
-            <select name="record_filter" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+            <select name="record_filter" onchange="this.form.submit()" class="form-control xl:w-56">
                 <option value="" {{ request('record_filter') === null || request('record_filter') === '' ? 'selected' : '' }}>All Statuses and Alerts</option>
                 <optgroup label="Detainee status">
                     <option value="status:active" {{ request('record_filter') === 'status:active' ? 'selected' : '' }}>Active</option>
@@ -40,7 +40,7 @@
                 </optgroup>
             </select>
             
-            <select name="facility_id" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-taya-accent focus:border-taya-accent">
+            <select name="facility_id" onchange="this.form.submit()" class="form-control xl:w-56">
                 <option value="">All Facilities</option>
                 @foreach($facilities as $facility)
                     <option value="{{ $facility->id }}" {{ request('facility_id') == $facility->id ? 'selected' : '' }}>
@@ -63,8 +63,8 @@
 
     <!-- Detainees Table -->
     <div class="glass-panel overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+        <div class="table-scroll">
+            <table class="data-table responsive-table">
                 <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th scope="col" class="px-6 py-4 font-semibold">Detainee Name</th>
@@ -77,8 +77,8 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($detainees as $detainee)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        <tr class="data-row">
+                            <td data-label="Detainee" class="whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-taya-navy-100 text-taya-navy-700 flex items-center justify-center font-bold text-xs">
                                         {{ substr($detainee->full_name, 0, 1) }}
@@ -88,20 +88,20 @@
                                     </a>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td data-label="Primary charge">
                                 <div class="flex flex-col">
                                     <span class="text-gray-900 font-medium">{{ $detainee->penaltyReference->charge_name }}</span>
                                     <span class="text-xs text-gray-500 truncate max-w-xs">{{ $detainee->charge_description }}</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                            <td data-label="Facility" class="whitespace-nowrap text-gray-600">
                                 {{ $detainee->facility->name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Commitment date" class="whitespace-nowrap">
                                 <span class="text-gray-900">{{ $detainee->commitment_date->format('M d, Y') }}</span>
                                 <span class="text-xs text-gray-500 block">({{ $detainee->days_detained }} days ago)</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td data-label="Status / alert" class="whitespace-nowrap">
                                 <div class="flex flex-col gap-1.5 items-start">
                                     @if($detainee->status === 'active')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -121,7 +121,7 @@
                                     @endif
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <td data-label="Action" class="whitespace-nowrap text-right">
                                 <a href="{{ route('detainees.show', $detainee) }}" class="text-taya-accent hover:text-taya-accent-dark font-medium text-sm">
                                     View Details &rarr;
                                 </a>

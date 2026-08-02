@@ -40,6 +40,7 @@
     color:var(--text-primary);
     font-family:'IBM Plex Sans', sans-serif;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   h1,h2,h3,.display{
     font-family:'Space Grotesk', sans-serif;
@@ -81,7 +82,7 @@
     text-decoration:none;
   }
 
-  .page-shell{ min-height:100vh; display:flex; flex-direction:column; }
+  .page-shell{ min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; }
   main{ flex:1; }
 
   footer{
@@ -95,10 +96,24 @@
 
   @media(max-width:820px){
     header{ padding:14px 18px; }
-    nav{ gap:12px; flex-wrap:wrap; }
-    nav a{ display:inline-flex; }
-    .staff-pill{ order:2; margin-top:6px; }
+    .brand-icon{ width:38px; height:38px; }
+    .brand-name{ font-size:17px; }
+    nav{ gap:8px; }
+    nav a:not(.staff-pill){ display:none; }
+    .staff-pill{ padding:8px 13px; white-space:nowrap; }
     footer{ flex-direction:column; gap:14px; padding:28px 22px; text-align:center; }
+    .footer-links{ justify-content:center; flex-wrap:wrap; gap:12px 18px; }
+  }
+
+  @media(max-width:420px){
+    header{ padding-inline:12px; }
+    .brand-tag{ display:none; }
+    .staff-pill{ font-size:12.5px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html{ scroll-behavior:auto; }
+    *,*::before,*::after{ animation:none !important; transition-duration:.01ms !important; }
   }
 </style>
 @stack('styles')
@@ -106,20 +121,24 @@
 <body>
 <div class="page-shell">
   <header>
-    <a href="/" class="brand">
+    <a href="/" class="brand" aria-label="TAYA home">
       <div class="brand-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 3v4"/><path d="M12 21v-8"/><path d="M5 8l7-1 7 1"/><path d="M5 8l-2 6a3 3 0 0 0 6 0Z"/><path d="M19 8l2 6a3 3 0 0 1-6 0Z"/></svg>
       </div>
-      <nav>
+      <div>
+        <div class="brand-name">TAYA</div>
+        <div class="brand-tag">Detainee Rights &amp; Overstay Alert System</div>
+      </div>
+    </a>
+      <nav aria-label="Public navigation">
         @unless(request()->routeIs('tracking.show'))
           <a href="{{ route('tracking.landing') }}">Estimate Duration</a>
           <a href="{{ route('tracking.lookup') }}">Track a Detainee</a>
           <a href="{{ route('tracking.landing') }}#rights">Know Your Rights</a>
           <a href="{{ route('tracking.landing') }}#how">How It Works</a>
         @endunless
-        <a class="staff-pill" href="{{ route('login') }}">Staff Login →</a>
+        <a class="staff-pill" href="{{ route('login') }}">Staff Login &rarr;</a>
       </nav>
-    </a>
   </header>
 
   <main>
@@ -129,13 +148,13 @@
   <footer>
     <div class="footer-brand">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 3v4"/><path d="M12 21v-8"/></svg>
-      © 2026 TAYA System. All rights reserved.
+      &copy; {{ date('Y') }} TAYA System. All rights reserved.
     </div>
     <div class="footer-links">
       <a href="#">Privacy Policy</a>
       <a href="#">Data Privacy Act Notice</a>
       <a href="#">Contact BJMP</a>
-      <a href="{{ route('login') }}">Staff Login →</a>
+      <a href="{{ route('login') }}">Staff Login &rarr;</a>
     </div>
   </footer>
 </div>

@@ -17,7 +17,7 @@
     
 </head>
 <body class="font-sans antialiased bg-gray-50 text-gray-900">
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex bg-gray-50">
+    <div x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false" class="flex min-h-screen min-h-dvh bg-gray-50">
         
         <!-- Sidebar Backdrop (Mobile) -->
         <div x-show="sidebarOpen" 
@@ -33,17 +33,17 @@
         <!-- Sidebar -->
         <aside 
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-taya-navy-900 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-2xl flex flex-col">
+            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-taya-navy-900 text-white shadow-xl transition-transform duration-300 ease-in-out lg:static lg:inset-0 lg:translate-x-0">
             
             <!-- Logo area -->
-            <div class="flex items-center justify-between h-20 px-6 bg-taya-navy-900 border-b border-white/10 shrink-0">
+            <div class="flex h-16 shrink-0 items-center justify-between border-b border-white/10 bg-taya-navy-900 px-5">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-taya-accent to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-taya-accent to-indigo-600 shadow-md shadow-blue-500/20">
+                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
                         </svg>
                     </div>
-                    <span class="text-2xl font-bold tracking-tight text-white">TAYA</span>
+                    <span class="text-xl font-bold tracking-tight text-white">TAYA</span>
                 </a>
                 <button @click="sidebarOpen = false" class="lg:hidden p-2 rounded-md hover:bg-white/10 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <div class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
                 @php
                     $currentUser = auth()->user();
                     $isAdmin = $currentUser->isAdmin();
@@ -63,28 +63,28 @@
                 </x-nav-link>
 
                 @if($canViewCases)
-                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">Detainee Management</div>
+                <div class="px-3 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-wider text-white/40">Detainee Management</div>
                 <x-nav-link href="{{ route('detainees.index') }}" :active="request()->routeIs('detainees.*')" icon="users">
                     Detainee Records
                 </x-nav-link>
                 @endif
 
                 @if($canViewCases)
-                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">Alerts & Legal Actions</div>
+                <div class="px-3 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-wider text-white/40">Alerts & Legal Actions</div>
                 <x-nav-link href="{{ route('alerts.index') }}" :active="request()->routeIs('alerts.*')" icon="bell">
                     Alert Queue
                 </x-nav-link>
                 @endif
 
                 @if($canViewCases)
-                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">Reports & Analytics</div>
+                <div class="px-3 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-wider text-white/40">Reports & Analytics</div>
                 <x-nav-link href="{{ route('reports.analytics') }}" :active="request()->routeIs('reports.analytics')" icon="chart-bar">
                     System Analytics
                 </x-nav-link>
                 @endif
 
                 @if($isAdmin)
-                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-white/40 uppercase tracking-wider">Administration</div>
+                <div class="px-3 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-wider text-white/40">Administration</div>
                 <x-nav-link href="{{ route('admin.users.index') }}" :active="request()->routeIs('admin.users.*')" icon="user-group">
                     User Management
                 </x-nav-link>
@@ -103,9 +103,9 @@
             </div>
             
             <!-- User Profile (Bottom of sidebar) -->
-            <div class="p-4 bg-taya-navy-800 border-t border-white/10 shrink-0">
+            <div class="shrink-0 border-t border-white/10 bg-taya-navy-800 p-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-taya-navy-600 flex items-center justify-center font-bold text-white shadow-inner">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-taya-navy-600 font-bold text-white shadow-inner">
                         {{ substr(auth()->user()->name, 0, 1) }}
                     </div>
                     <div class="flex-1 min-w-0">
@@ -128,15 +128,15 @@
         <!-- Main Content Wrapper -->
         <div class="flex-1 flex flex-col min-w-0 bg-gray-50 transition-all duration-300">
             <!-- Top Navbar -->
-            <header class="bg-white/80 backdrop-blur-md border-b border-gray-200 h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 sticky top-0 shadow-sm">
-                <div class="flex items-center">
+            <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 shadow-sm backdrop-blur-md sm:px-5 lg:px-6">
+                <div class="flex min-w-0 items-center">
                     <button @click="sidebarOpen = true" class="lg:hidden p-2 -ml-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-taya-accent transition-colors">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                     
-                    <h1 class="text-xl font-bold text-gray-900 ml-2 lg:ml-0 hidden sm:block animate-fade-in">
+                    <h1 class="ml-2 truncate text-base font-bold text-gray-900 sm:text-lg lg:ml-0">
                         @if(isset($header))
                             {{ $header }}
                         @else
@@ -145,7 +145,7 @@
                     </h1>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                         @php
                             $recentAlerts = \App\Models\Alert::visibleTo(auth()->user())->with('detainee')->latest()->limit(5)->get();
                             $unresolvedCount = \App\Models\Alert::visibleTo(auth()->user())->whereNull('resolved_at')->count();
@@ -167,7 +167,7 @@
                                  x-transition:leave="transition ease-in duration-75"
                                  x-transition:leave-start="transform opacity-100 scale-100"
                                  x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 py-2 z-50" style="display: none;">
+                                 class="absolute right-0 z-50 mt-2 w-[calc(100vw-2rem)] max-w-sm rounded-xl bg-white py-2 shadow-xl ring-1 ring-black/5" style="display: none;">
                                 <div class="px-4 py-3 border-b border-gray-100">
                                     <div class="flex items-center justify-between">
                                         <p class="text-sm font-semibold text-gray-900">Notifications</p>
@@ -212,7 +212,7 @@
                              x-transition:leave="transition ease-in duration-75"
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 py-1 z-50"
+                             class="absolute right-0 z-50 mt-2 w-60 rounded-xl bg-white py-1 shadow-xl ring-1 ring-black/5"
                              style="display: none;">
                             <div class="px-4 py-4 border-b border-gray-100">
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</p>
@@ -231,7 +231,7 @@
             </header>
 
             <!-- Main Content Area -->
-            <main class="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in relative z-10">
+            <main class="relative z-10 mx-auto w-full max-w-[1600px] flex-1 p-3 sm:p-5 lg:p-6">
                 <!-- Flash Messages -->
                 @if (session('success'))
                     <div x-data="{ show: true }" x-show="show" class="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3 shadow-sm animate-slide-in-right">

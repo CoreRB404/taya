@@ -298,6 +298,20 @@
     .grid {
       grid-template-columns: 1fr;
     }
+
+    .code-chip {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .panel {
+      padding: 20px 16px;
+    }
+
+    .t-card {
+      flex-direction: column;
+      padding: 16px;
+    }
   }
 </style>
 @endpush

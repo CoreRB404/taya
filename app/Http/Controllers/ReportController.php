@@ -99,6 +99,11 @@ class ReportController extends Controller
             ->pluck('count', 'month')
             ->toArray();
 
+        $emptyResolutionMonths = collect(range(5, 0))
+            ->mapWithKeys(fn (int $monthsAgo) => [now()->subMonths($monthsAgo)->format('Y-m') => 0])
+            ->all();
+        $resolutionsOverTime = array_replace($emptyResolutionMonths, $resolutionsOverTime);
+
         $unableToPayBail = Detainee::visibleTo($user)->where('status', 'active')
             ->where('bail_status', 'unable_to_pay')
             ->count();

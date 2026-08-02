@@ -110,15 +110,22 @@
   .rights-list svg{ flex-shrink:0; margin-top:2px; color:var(--accent-cyan); }
 
   @media(max-width:820px){
-    .headline{ font-size:32px; }
+    .hero{ padding:48px 18px 0; }
+    .headline{ font-size:30px; }
+    .search-wrap{ margin-top:30px; padding:0 16px; }
     .card{ padding:26px 22px; }
     .input-row{ flex-direction:column; }
     .btn-search{ padding:0.9rem 1rem; }
     .rail-steps{ flex-wrap:wrap; row-gap:28px; }
     .rail-track{ display:none; }
-    .rail-step{ flex:0 0 33%; }
+    .rail-step{ flex:0 0 50%; }
     .how-grid{ grid-template-columns:1fr; }
     .rights-card{ grid-template-columns:1fr; }
+  }
+  @media(max-width:420px){
+    .card{ padding:20px 16px; border-radius:14px; }
+    .btn-search{ width:100%; min-height:48px; }
+    .rail-section{ margin-top:64px; padding:0 16px; }
   }
 </style>
 

@@ -26,6 +26,7 @@
     background-attachment:fixed;
     color:var(--text-primary); font-family:'IBM Plex Sans', sans-serif;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   h1,h2,h3{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; margin:0; }
   .mono{ font-family:'IBM Plex Mono', monospace; }
@@ -173,10 +174,15 @@
   .footer-links a:hover{ color:var(--text-secondary); }
 
   @media(max-width:820px){
-    header{ padding:16px 20px; }
+    header{ padding:14px 16px; }
+    .brand-icon{ width:38px; height:38px; }
+    .brand-tag{ display:none; }
     nav{ gap:14px; }
     nav a.navlink{ display:none; }
-    h1.headline{ font-size:32px; }
+    .header-actions .btn-primary{ display:none; }
+    .btn-ghost{ padding:9px 13px; }
+    .hero{ padding:48px 18px 0; }
+    h1.headline{ font-size:30px; }
     .card{ padding:24px 20px; }
     .input-row{ flex-direction:column; }
     .form-grid{ grid-template-columns:1fr; }
@@ -184,11 +190,18 @@
     .t-row{ flex-direction:column; align-items:flex-start; gap:10px; }
     .rail-steps{ flex-wrap:wrap; row-gap:28px; }
     .rail-track{ display:none; }
-    .rail-step{ flex:0 0 33%; }
+    .rail-step{ flex:0 0 50%; }
     .how-grid{ grid-template-columns:1fr; }
     .rights-card{ grid-template-columns:1fr; }
     footer{ flex-direction:column; gap:14px; padding:28px 22px; text-align:center; }
+    .footer-links{ flex-wrap:wrap; justify-content:center; gap:12px 18px; }
   }
+  @media(max-width:420px){
+    .search-wrap,.rail-section,.how-section,.rights-section{ padding-left:16px; padding-right:16px; }
+    .card{ padding:20px 16px; border-radius:14px; }
+    .rights-card{ padding:22px 18px; }
+  }
+  @media(prefers-reduced-motion:reduce){ *,*::before,*::after{ animation:none!important; transition-duration:.01ms!important; } html{ scroll-behavior:auto; } }
 </style>
 </head>
 <body>
