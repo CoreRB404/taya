@@ -151,7 +151,7 @@ class PhaseComplianceService
         );
     }
 
-    public function computeOverstay(Detainee $detainee): OverstayComputation
+    public function computeOverstay(Detainee $detainee, bool $sendNotifications = true): OverstayComputation
     {
         $penalty = $detainee->penaltyReference;
 
@@ -205,7 +205,7 @@ class PhaseComplianceService
         // If the alert is assigned, notify the assigned user. If unassigned,
         // notify the pool of responsible users (admins / lawyers) so the
         // alert still generates a mail log entry even when not explicitly assigned.
-        if (in_array($alertLevel, ['critical', 'at_risk'])) {
+        if ($sendNotifications && in_array($alertLevel, ['critical', 'at_risk'])) {
             if ($alert->assigned_to) {
                 $alert->assignedUser->notify(new AlertNotification($alert));
             } else {

@@ -73,15 +73,21 @@ class DetaineeSeeder extends Seeder
                 : $penalties->random();
             $commitmentDate = Carbon::now()->subDays($data['days_ago']);
 
-            $detainee = Detainee::create([
-                'facility_id' => $facility->id,
-                'full_name' => $data['name'],
-                'commitment_date' => $commitmentDate,
-                'charge_rpc_code' => $penalty->id,
-                'charge_description' => $penalty->charge_name,
-                'status' => $data['status'] ?? 'active',
-                'created_by' => $admin->id,
-            ]);
+            $detainee = Detainee::firstOrCreate(
+                ['full_name' => $data['name']],
+                [
+                    'facility_id' => $facility->id,
+                    'commitment_date' => $commitmentDate,
+                    'charge_rpc_code' => $penalty->id,
+                    'charge_description' => $penalty->charge_name,
+                    'status' => $data['status'] ?? 'active',
+                    'created_by' => $admin->id,
+                ]
+            );
+
+            if (! $detainee->wasRecentlyCreated) {
+                continue;
+            }
 
             // Initialize the 4 compliance phases with real due dates
             $phaseService->initializePhases($detainee);
@@ -98,7 +104,7 @@ class DetaineeSeeder extends Seeder
             }
 
             // Compute overstay and generate alerts
-            $phaseService->computeOverstay($detainee);
+            $phaseService->computeOverstay($detainee, sendNotifications: false);
 
             if (!empty($data['target_alert'])) {
                 $latestAlert = $detainee->alerts()->latest()->first();

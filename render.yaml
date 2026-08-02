@@ -53,6 +53,8 @@ services:
         value: sync
       - key: REGISTRATION_ENABLED
         value: "false"
+      - key: SEED_SAMPLE_DATA
+        value: "true"
       - key: ADMIN_NAME
         value: System Admin
       - key: ADMIN_EMAIL

@@ -35,10 +35,13 @@ class PenaltyReferenceSeeder extends Seeder
         ];
 
         foreach ($penalties as $penalty) {
-            PenaltyReference::create([
-                ...$penalty,
-                'last_validated' => now(),
-            ]);
+            PenaltyReference::updateOrCreate(
+                ['rpc_code' => $penalty['rpc_code']],
+                [
+                    ...$penalty,
+                    'last_validated' => now(),
+                ]
+            );
         }
     }
 }

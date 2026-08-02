@@ -64,6 +64,10 @@ This repository includes [render.yaml](render.yaml) and a multi-stage [Dockerfil
 7. Set one-time bootstrap secrets `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`. After the first successful deploy, remove `ADMIN_PASSWORD`; the seeder will never change the existing account.
 8. Deploy. The container caches Laravel configuration/views/routes, runs migrations, and idempotently creates the first admin.
 
+### Optional demonstration data
+
+Set `SEED_SAMPLE_DATA=true` to load the bundled demonstration facilities, penalty references, users, detainees, phases, alerts, and legal actions. The sample loader records `taya-sample-data-v1` in the `data_seed_runs` table and safely skips later deploys, so the records are created only once. Demonstration users receive random unknown passwords; use User Management to assign a password if a specific sample account must be used for testing. Keep this setting disabled for installations that will contain real records.
+
 Render Free sleeps after inactivity and is explicitly intended for previews/hobby workloads rather than sensitive production systems. Uploaded documents now use durable private Supabase Storage, but scheduled checks still run only while the web instance is awake.
 
 ## Verification
