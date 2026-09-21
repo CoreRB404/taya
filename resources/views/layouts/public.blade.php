@@ -122,13 +122,7 @@
 <div class="page-shell">
   <header>
     <a href="/" class="brand" aria-label="TAYA home">
-      <div class="brand-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 3v4"/><path d="M12 21v-8"/><path d="M5 8l7-1 7 1"/><path d="M5 8l-2 6a3 3 0 0 0 6 0Z"/><path d="M19 8l2 6a3 3 0 0 1-6 0Z"/></svg>
-      </div>
-      <div>
-        <div class="brand-name">TAYA</div>
-        <div class="brand-tag">Detainee Rights &amp; Overstay Alert System</div>
-      </div>
+      <x-taya-logo tagline />
     </a>
       <nav aria-label="Public navigation">
         @unless(request()->routeIs('tracking.show'))
