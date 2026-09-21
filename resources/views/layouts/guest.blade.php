@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=1">
 
         <title>{{ config('app.name', 'TAYA') }} - Sign In</title>
 
@@ -246,11 +247,6 @@
     <body class="font-sans antialiased">
         <div class="login-bg flex flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-10">
             <div class="grid-pattern"></div>
-
-            <!-- Logo & Branding -->
-            <div class="relative z-10 mb-5 text-center animate-card-in sm:mb-7">
-                <x-taya-logo tagline class="mb-2" />
-            </div>
 
             <!-- Login Card -->
             <div class="login-card relative z-10 w-full max-w-md rounded-xl p-5 transition-all duration-300 animate-card-in stagger-1 sm:p-7">
