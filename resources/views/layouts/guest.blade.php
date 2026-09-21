@@ -248,6 +248,19 @@
         <div class="login-bg flex flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-10">
             <div class="grid-pattern"></div>
 
+            <!-- Logo & Branding -->
+            <div class="relative z-10 mb-5 text-center animate-card-in sm:mb-7">
+                <div class="mb-2 inline-flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 sm:h-12 sm:w-12">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold tracking-tight text-white sm:text-3xl">TAYA</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem; letter-spacing: 0.025em;">Detainee Rights & Overstay Alert System</p>
+            </div>
+
             <!-- Login Card -->
             <div class="login-card relative z-10 w-full max-w-md rounded-xl p-5 transition-all duration-300 animate-card-in stagger-1 sm:p-7">
                 {{ $slot }}
